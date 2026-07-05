@@ -7,8 +7,8 @@
  * Started once as a global singleton from the Next.js instrumentation hook
  * (`src/instrumentation.ts`) so it runs only in the Node.js server process.
  */
-import { Kafka } from 'kafkajs'
 import type { BasePayload } from 'payload'
+import { createKafkaClient } from './client'
 
 const DELAY_TOPIC = process.env.KAFKA_DELAY_TOPIC ?? 'flight-delays'
 
@@ -18,10 +18,7 @@ export async function startDelayConsumer(payload: BasePayload): Promise<void> {
     return
   }
 
-  const kafka = new Kafka({
-    clientId: 'airvault-delay-consumer',
-    brokers: process.env.KAFKA_BOOTSTRAP_SERVERS.split(','),
-  })
+  const kafka = createKafkaClient('airvault-delay-consumer')
 
   const consumer = kafka.consumer({ groupId: 'delay-processor' })
   await consumer.connect()

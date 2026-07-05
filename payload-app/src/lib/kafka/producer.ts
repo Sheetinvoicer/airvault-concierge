@@ -1,14 +1,12 @@
-import { Kafka, type Producer } from 'kafkajs'
+import type { Producer } from 'kafkajs'
+import { createKafkaClient } from './client'
 
 const CLAIM_TOPIC = process.env.KAFKA_CLAIM_TOPIC ?? 'claim-processed'
 
 let producer: Producer | null = null
 
-function getKafka(): Kafka {
-  return new Kafka({
-    clientId: 'airvault-payload',
-    brokers: (process.env.KAFKA_BOOTSTRAP_SERVERS ?? 'kafka:9092').split(','),
-  })
+function getKafka() {
+  return createKafkaClient('airvault-payload')
 }
 
 async function getProducer(): Promise<Producer> {

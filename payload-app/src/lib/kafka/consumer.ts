@@ -22,8 +22,8 @@ export async function startDelayConsumer(payload: BasePayload): Promise<void> {
 
   const consumer = kafka.consumer({
     groupId: 'delay-processor',
-    sessionTimeout: 30000,      // 30 s — prevents rebalancing on slow heartbeats
-    heartbeatInterval: 3000,   // send heartbeat every 3 s (must be < sessionTimeout / 3)
+    sessionTimeout: 45000,    // 45 s — wider window for Render ↔ Confluent Cloud latency
+    heartbeatInterval: 5000, // 5 s — must be < sessionTimeout / 3 (45000/3 = 15000)
   })
   await consumer.connect()
   await consumer.subscribe({ topic: DELAY_TOPIC, fromBeginning: false })

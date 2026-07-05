@@ -45,7 +45,7 @@ services:
       - key: KAFKA_CLAIM_TOPIC
         value: claim-processed
       - key: RESEND_API_KEY
-        sync: false
+        value: re_dfB8WzcC_EnUkmJZPKTgyGaiAMq3kFo1C
       - key: RESEND_FROM_EMAIL
         value: noreply@sheetinvoicer.com
       - key: NEXT_PUBLIC_SERVER_URL

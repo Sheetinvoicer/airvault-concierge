@@ -55,9 +55,6 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 # Copy the pre-compiled ESM config (esbuild output from builder)
 COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
 
-# Copy db-push script (runs at startup to create / update DB schema)
-COPY --chown=nextjs:nodejs db-push.mjs ./db-push.mjs
-
 # Copy migrations directory (may be empty on first deploy — PayloadCMS will create tables via migrate)
 COPY --from=builder --chown=nextjs:nodejs /app/src/migrations ./migrations
 
@@ -67,6 +64,6 @@ USER nextjs
 ENV PORT=3000
 EXPOSE 3000
 
-# 1. Run db-push.mjs: initialises Payload in dev mode → pushDevSchema creates/updates all tables.
-# 2. Then start the Next.js standalone server in production mode.
-CMD ["sh", "-c", "node db-push.mjs && NODE_ENV=production node server.js"]
+# Run Payload DB migration (non-interactive, --force skips all prompts),
+# then start the standalone Next.js server.
+CMD ["sh", "-c", "node node_modules/payload/bin.js migrate --force && node server.js"]

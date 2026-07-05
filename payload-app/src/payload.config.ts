@@ -1,3 +1,4 @@
+import { resendAdapter } from '@payloadcms/email-resend'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -38,4 +39,11 @@ export default buildConfig({
     schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
   },
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+
+  // 👇 ADD THIS BLOCK – Resend Email Adapter
+  email: resendAdapter({
+    apiKey: process.env.RESEND_API_KEY || '',
+    defaultFromAddress: process.env.RESEND_FROM_EMAIL || 'noreply@your-verified-domain.com',
+    defaultFromName: 'AirVault Concierge',
+  }),
 })

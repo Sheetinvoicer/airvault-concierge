@@ -11,6 +11,10 @@ export function getRedis(): Redis {
       maxRetriesPerRequest: 3,
     })
 
+    redisClient.on('connect', () => {
+      console.log(`[Redis] Connected since ${new Date().toISOString()}`)
+    })
+
     redisClient.on('error', (err) => {
       console.error('[Redis] connection error:', err.message)
     })

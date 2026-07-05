@@ -1,5 +1,5 @@
 import { resendAdapter } from '@payloadcms/email-resend'
-import { postgresAdapter } from '@payloadcms/db-postgres'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -29,15 +29,10 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URI ?? process.env.DATABASE_URL ?? '',
+  db: sqliteAdapter({
+    client: {
+      url: process.env.DATABASE_URL ?? 'file:./database.db',
     },
-    // Use process.cwd() so the path resolves to /app/migrations in Docker regardless
-    // of where the compiled Next.js chunk lives (import.meta.url points deep inside .next/server/)
-    migrationDir: process.env.NODE_ENV === 'production'
-      ? path.resolve(process.cwd(), 'migrations')
-      : path.resolve(dirname, '..', 'migrations'),
   }),
   sharp,
   graphQL: {

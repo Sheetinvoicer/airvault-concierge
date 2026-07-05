@@ -1,0 +1,53 @@
+<svg width="400" height="500" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" aria-label="Blue S with gold ends" role="img">
+    <defs>
+        <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="##0a3e8a"/>
+            <stop offset="60%" stop-color="##174ea8"/>
+            <stop offset="100%" stop-color="##1a58bf"/>
+        </linearGradient>
+        <linearGradient id="blueGradDeep" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="##0c2f66"/>
+            <stop offset="100%" stop-color="##0b4aa8"/>
+        </linearGradient>
+        <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="##f6c34d"/>
+            <stop offset="60%" stop-color="##e6a726"/>
+            <stop offset="100%" stop-color="##d0951b"/>
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="##000" flood-opacity="0.25"/>
+        </filter>
+    </defs>
+
+    <!-- Outer blue S-like ribbon -->
+    <path d="M180,60
+           C150,110 120,170 150,210
+           L170,235
+           C205,260 210,305 180,340
+           C150,375 110,410 120,440
+           L160,480"
+          fill="none" stroke="url(##blueGrad)" stroke-width="28" stroke-linecap="round" filter="url(##shadow)"/>
+
+    <!-- Inner white cut-out look -->
+    <path d="M190,70
+           C165,110 140,165 168,210
+           L194,235
+           C223,260 226,305 198,340
+           C170,375 135,410 140,440"
+          fill="none" stroke="white" stroke-width="26" stroke-linecap="round"/>
+
+    <!-- Inner blue offset for depth -->
+    <path d="M190,70
+           C165,110 140,165 168,210
+           L194,235
+           C223,260 226,305 198,340
+           C170,375 135,410 140,440"
+          fill="none" stroke="url(##blueGradDeep)" stroke-width="14" stroke-linecap="round"/>
+
+    <!-- Top gold piece -->
+    <path d="M230,30 L310,110 L300,140 L222,60 Z" fill="url(##goldGrad)"/>
+
+    <!-- Bottom gold piece -->
+    <path d="M170,470 L90,390 L100,360 L178,440 Z" fill="url(##goldGrad)"/>
+
+</svg>

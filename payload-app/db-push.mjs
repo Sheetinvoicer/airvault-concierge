@@ -1,7 +1,7 @@
 /**
  * db-push.mjs — run at container startup BEFORE node server.js
  *
- * Initialises Payload with NODE_ENV=development so that @payloadcms/db-postgres
+ * Initialises Payload with NODE_ENV=development so that @payloadcms/db-sqlite
  * triggers pushDevSchema (Drizzle schema push), which creates / updates all
  * tables without needing pre-generated migration files.
  *
@@ -9,16 +9,21 @@
  * `NODE_ENV=production node server.js`.
  */
 import { getPayload } from 'payload'
+import { tsImport } from 'tsx/esm/api'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import path from 'node:path'
 
 // Force dev mode so connect.js calls pushDevSchema
 process.env.NODE_ENV = 'development'
 process.env.PAYLOAD_MIGRATING = 'false'
 
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const baseUrl = pathToFileURL(dirname).toString() + '/'
+
 async function main() {
-  console.log('[db-push] Pushing schema to Postgres...')
+  console.log('[db-push] Pushing schema to SQLite...')
   try {
-    const configPath = new URL('./dist/payload.config.mjs', import.meta.url)
-    const mod = await import(configPath.toString())
+    const mod = await tsImport('./src/payload.config.ts', baseUrl)
     const config = mod.default ?? mod
 
     const payload = await getPayload({ config })

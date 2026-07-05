@@ -11,6 +11,17 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  webpack(config, { isServer }) {
+    if (isServer) {
+      // Monaco Editor is browser-only; stub it out on the server to prevent
+      // SSR crashes ("window is not defined", worker errors) during build/deploy.
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'monaco-editor': false,
+      }
+    }
+    return config
+  },
 }
 
 export default withPayload(nextConfig)

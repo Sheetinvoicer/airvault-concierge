@@ -17,7 +17,6 @@ services:
     dockerfilePath: ./payload-app/Dockerfile
     dockerContext: ./payload-app
     plan: starter
-    dockerCommand: sh -c "node node_modules/payload/bin.js migrate --force && node server.js"
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URI

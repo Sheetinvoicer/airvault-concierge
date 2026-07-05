@@ -1,0 +1,218 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - airvault
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - airvault
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airvault
+      POSTGRES_PASSWORD: airvaultpass
+      POSTGRES_DB: airvault
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - airvault
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airvault"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - airvault
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://airvault:airvaultpass@postgres:5432/airvault
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY:-placeholder}
+      - JWT_SECRET=${JWT_SECRET:-local-dev-secret-change-in-production}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - airvault
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://payload-app:3000
+    command: npm run dev
+    networks:
+      - airvault
+
+  # ── PayloadCMS + Next.js (production mode) ────────────────────────────────
+  payload-app:
+    build:
+      context: ./payload-app
+      dockerfile: Dockerfile
+      # No target — builds full image (deps → builder → runner)
+    container_name: payload-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - DATABASE_URI=postgresql://airvault:airvaultpass@postgres:5432/airvault
+      - DATABASE_URL=postgresql://airvault:airvaultpass@postgres:5432/airvault
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET:-dev-payload-secret-change-me}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY:-placeholder}
+      - NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    # No volumes mounted — uses built code inside container
+    # No command override — uses Dockerfile CMD (migrate --force && node server.js)
+    networks:
+      - airvault
+    restart: unless-stopped
+
+  # Observability stack (optional)
+  loki:
+    image: grafana/loki:2.9.5
+    container_name: loki
+    ports:
+      - "3200:3100"
+    volumes:
+      - ./infra/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - airvault
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    networks:
+      - airvault
+
+  tempo:
+    image: grafana/tempo:2.4.0
+    container_name: tempo
+    ports:
+      - "3300:3200"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./infra/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - tempo_data:/tmp/tempo
+    command: -config.file=/etc/tempo.yaml
+    networks:
+      - airvault
+
+  grafana:
+    image: grafana/grafana-oss:10.4.0
+    container_name: grafana
+    ports:
+      - "3100:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=airvault
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_FEATURE_TOGGLES_ENABLE=tempoSearch traceToMetrics
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+    networks:
+      - airvault
+
+volumes:
+  postgres_data:
+  loki_data:
+  prometheus_data:
+  tempo_data:
+  grafana_data:
+
+networks:
+  airvault:
+    driver: bridge

@@ -1,0 +1,47 @@
+databases:
+  - name: airvault-postgres
+    databaseName: airvault
+    user: airvault
+    plan: free
+
+  - name: airvault-redis
+    plan: free
+    type: redis
+
+services:
+  - type: web
+    name: airvault-app
+    env: docker
+    region: oregon
+    dockerfilePath: ./payload-app/Dockerfile
+    dockerContext: ./payload-app
+    plan: starter
+    dockerCommand: sh -c "node_modules/.bin/payload migrate --force && node server.js"
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URI
+        fromDatabase:
+          name: airvault-postgres
+          property: connectionString
+      - key: DATABASE_URL
+        fromDatabase:
+          name: airvault-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: airvault-redis
+          type: redis
+          property: connectionString
+      - key: PAYLOAD_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: RAPIDAPI_KEY
+        sync: false
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false   # leave blank to disable Kafka; set to Upstash Kafka URL to enable
+      - key: NEXT_PUBLIC_SERVER_URL
+        value: https://airvault-app.onrender.com
+      - key: NEXT_PUBLIC_API_URL
+        value: https://airvault-app.onrender.com
+

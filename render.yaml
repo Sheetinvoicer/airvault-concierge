@@ -47,7 +47,7 @@ services:
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_FROM_EMAIL
-        sync: false
+        value: noreply@sheetinvoicer.com
       - key: NEXT_PUBLIC_SERVER_URL
         value: https://airvault-app.onrender.com
       - key: NEXT_PUBLIC_API_URL

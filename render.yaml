@@ -4,11 +4,11 @@ databases:
     user: airvault
     plan: free
 
-  - name: airvault-redis
-    plan: free
-    type: redis
-
 services:
+  - type: redis
+    name: airvault-redis
+    plan: free
+    maxmemoryPolicy: noeviction
   - type: web
     name: airvault-app
     env: docker
@@ -16,7 +16,7 @@ services:
     dockerfilePath: ./payload-app/Dockerfile
     dockerContext: ./payload-app
     plan: starter
-    dockerCommand: sh -c "node_modules/.bin/payload migrate --force && node server.js"
+    dockerCommand: sh -c "node node_modules/payload/bin.js migrate --force && node server.js"
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URI

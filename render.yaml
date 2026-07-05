@@ -9,6 +9,7 @@ services:
     name: airvault-redis
     plan: free
     maxmemoryPolicy: noeviction
+    ipAllowList: []
   - type: web
     name: airvault-app
     env: docker

@@ -37,6 +37,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 # Point Payload at the pre-compiled ESM config (no tsx needed at runtime)
 ENV PAYLOAD_CONFIG_PATH=dist/payload.config.mjs
+# Suppress Node.js ExperimentalWarning for built-in SQLite (not used, but imported transitively)
+ENV NODE_OPTIONS="--no-warnings"
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -52,6 +54,9 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Copy the pre-compiled ESM config (esbuild output from builder)
 COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
+
+# Copy migrations directory (may be empty on first deploy — PayloadCMS will create tables via migrate)
+COPY --from=builder --chown=nextjs:nodejs /app/src/migrations ./migrations
 
 USER nextjs
 

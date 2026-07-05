@@ -33,7 +33,11 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI ?? process.env.DATABASE_URL ?? '',
     },
-    migrationDir: path.resolve(dirname, '..', 'migrations'),
+    // Use process.cwd() so the path resolves to /app/migrations in Docker regardless
+    // of where the compiled Next.js chunk lives (import.meta.url points deep inside .next/server/)
+    migrationDir: process.env.NODE_ENV === 'production'
+      ? path.resolve(process.cwd(), 'migrations')
+      : path.resolve(dirname, '..', 'migrations'),
   }),
   sharp,
   graphQL: {

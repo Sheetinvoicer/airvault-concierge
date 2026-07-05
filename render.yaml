@@ -31,7 +31,19 @@ services:
       - key: RAPIDAPI_KEY
         sync: false
       - key: KAFKA_BOOTSTRAP_SERVERS
-        sync: false   # leave blank to disable Kafka; set to Upstash Kafka URL to enable
+        value: pkc-12576z.us-west2.gcp.confluent.cloud:9092
+      - key: KAFKA_SASL_USERNAME
+        value: 2JMLZXEW7LZFDXTD
+      - key: KAFKA_SASL_PASSWORD
+        value: cfltriDBpmf7Qm02ByjrJel6YOeO8zTAqFn3ghYK3DiQ8GqroIPQTSNHBS840YpQ
+      - key: KAFKA_SECURITY_PROTOCOL
+        value: SASL_SSL
+      - key: KAFKA_SASL_MECHANISM
+        value: PLAIN
+      - key: KAFKA_DELAY_TOPIC
+        value: flight-delays
+      - key: KAFKA_CLAIM_TOPIC
+        value: claim-processed
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_FROM_EMAIL

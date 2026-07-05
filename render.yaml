@@ -32,6 +32,10 @@ services:
         sync: false
       - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false   # leave blank to disable Kafka; set to Upstash Kafka URL to enable
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
       - key: NEXT_PUBLIC_SERVER_URL
         value: https://airvault-app.onrender.com
       - key: NEXT_PUBLIC_API_URL

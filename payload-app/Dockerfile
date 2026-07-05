@@ -64,6 +64,7 @@ USER nextjs
 ENV PORT=3000
 EXPOSE 3000
 
-# Run Payload DB migration (non-interactive, --force skips all prompts),
-# then start the standalone Next.js server.
-CMD ["sh", "-c", "node node_modules/payload/bin.js migrate --force && node server.js"]
+# Attempt DB migration on startup (non-blocking: server starts even if migration fails).
+# This prevents Render's health-check timeout from rolling back the deploy when
+# the DB is briefly unavailable at startup time.
+CMD ["sh", "-c", "node node_modules/payload/bin.js migrate --force 2>&1 || true; node server.js"]

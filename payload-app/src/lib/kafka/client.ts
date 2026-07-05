@@ -20,10 +20,15 @@ export function createKafkaClient(clientId: string): Kafka {
   // Enable SASL/SSL when Confluent Cloud credentials are present
   if (process.env.KAFKA_SASL_USERNAME && process.env.KAFKA_SASL_PASSWORD) {
     config.ssl = true
-    config.sasl = {
-      mechanism: ((process.env.KAFKA_SASL_MECHANISM as 'plain' | 'scram-sha-256' | 'scram-sha-512') ?? 'plain').toLowerCase() as 'plain' | 'scram-sha-256' | 'scram-sha-512',
-      username: process.env.KAFKA_SASL_USERNAME,
-      password: process.env.KAFKA_SASL_PASSWORD,
+    const mechanism = ((process.env.KAFKA_SASL_MECHANISM ?? 'plain').toLowerCase()) as 'plain' | 'scram-sha-256' | 'scram-sha-512'
+    const username = process.env.KAFKA_SASL_USERNAME
+    const password = process.env.KAFKA_SASL_PASSWORD
+    if (mechanism === 'scram-sha-256') {
+      config.sasl = { mechanism: 'scram-sha-256', username, password }
+    } else if (mechanism === 'scram-sha-512') {
+      config.sasl = { mechanism: 'scram-sha-512', username, password }
+    } else {
+      config.sasl = { mechanism: 'plain', username, password }
     }
   }
 

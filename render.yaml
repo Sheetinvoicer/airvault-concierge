@@ -5,11 +5,6 @@ databases:
     plan: free
 
 services:
-  - type: redis
-    name: airvault-redis
-    plan: free
-    maxmemoryPolicy: noeviction
-    ipAllowList: []
   - type: web
     name: airvault-app
     env: docker
@@ -28,10 +23,7 @@ services:
           name: airvault-postgres
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          name: airvault-redis
-          type: redis
-          property: connectionString
+        value: redis://default:gQAAAAAAAWi-AAIgcDI4MDc0OWNhOGNjM2E0ZDUwYTA0YzY2ZWI3YWVlYzQ2Zg@skilled-anchovy-92350.upstash.io:6379
       - key: PAYLOAD_SECRET
         generateValue: true
       - key: STRIPE_SECRET_KEY

@@ -13,7 +13,7 @@
     "db:push": "node ./db-push.mjs"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "^3.85.0",
+    "@payloadcms/db-postgres": "^3.85.2",
     "@payloadcms/db-sqlite": "^3.85.2",
     "@payloadcms/email-resend": "^3.85.2",
     "@payloadcms/next": "^3.85.2",

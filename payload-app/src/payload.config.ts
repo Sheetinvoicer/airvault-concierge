@@ -1,5 +1,5 @@
 import { resendAdapter } from '@payloadcms/email-resend'
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'  // ✅ Changed from sqliteAdapter
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -27,11 +27,18 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URL ?? 'file:./database.db',
+  db: postgresAdapter({                    // ✅ Changed from sqliteAdapter
+    pool: {
+      connectionString: process.env.DATABASE_URI ?? '',
     },
   }),
   sharp,
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+
+  // Email adapter (keep as is)
+  email: resendAdapter({
+    apiKey: process.env.RESEND_API_KEY || '',
+    defaultFromAddress: process.env.RESEND_FROM_EMAIL || 'noreply@sheetinvoicer.com',
+    defaultFromName: 'AirVault Concierge',
+  }),
 })

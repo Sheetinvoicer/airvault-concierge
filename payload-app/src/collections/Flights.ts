@@ -11,6 +11,7 @@ export const Flights: CollectionConfig = {
       read: () => true,
       create: () => true,
       update: () => true,
+      delete: () => true,
   },
   fields: [
     {

@@ -6,6 +6,13 @@ export const Flights: CollectionConfig = {
     useAsTitle: 'id',
     description: 'Flight records — populated by the flight tracker service.',
   },
+
+  access: {
+      read: () => true,
+      create: () => true,
+      update: () => true,
+      delete: () => true,
+  },
   fields: [
     {
       name: 'airline',

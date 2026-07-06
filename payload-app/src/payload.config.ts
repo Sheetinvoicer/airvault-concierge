@@ -1,6 +1,5 @@
 import { resendAdapter } from '@payloadcms/email-resend'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -24,7 +23,6 @@ export default buildConfig({
     },
   },
   collections: [Users, Flights, Claims, Rides, PetChecklists, Meals],
-  editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET ?? 'dev-secret-change-in-production',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -35,15 +33,5 @@ export default buildConfig({
     },
   }),
   sharp,
-  graphQL: {
-    schemaOutputFile: path.resolve(dirname, 'generated-schema.graphql'),
-  },
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
-
-  // Resend Email Adapter — uses env vars set in Render dashboard
-  email: resendAdapter({
-    apiKey: process.env.RESEND_API_KEY || '',
-    defaultFromAddress: process.env.RESEND_FROM_EMAIL || 'noreply@sheetinvoicer.com',
-    defaultFromName: 'AirVault Concierge',
-  }),
 })

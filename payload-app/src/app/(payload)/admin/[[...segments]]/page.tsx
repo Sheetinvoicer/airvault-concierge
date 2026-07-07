@@ -1,5 +1,5 @@
 import { RootPage } from '@payloadcms/next/views'
-import config from '../../../../payload.config'
+import config from '@payload-config'
 import { importMap } from '../../importMap'
 
 type Args = {

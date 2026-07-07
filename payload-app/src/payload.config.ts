@@ -1,4 +1,5 @@
 import { resendAdapter } from '@payloadcms/email-resend'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -16,6 +17,9 @@ import { Meals } from './collections/Meals'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const databaseUri = process.env.DATABASE_URI ?? 'file:./database.db'
+const isPostgres = databaseUri.startsWith('postgresql:') || databaseUri.startsWith('postgres:')
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -28,11 +32,9 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI ?? 'file:./database.db',
-    },
-  }),
+  db: isPostgres
+    ? postgresAdapter({ pool: { connectionString: databaseUri } })
+    : sqliteAdapter({ client: { url: databaseUri } }),
   sharp,
   serverURL: process.env._PUBLIC_SERVER_URL ?? 'http://localhost:3000',
 

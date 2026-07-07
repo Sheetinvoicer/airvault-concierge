@@ -1,33 +1,3 @@
-# ── Dependencies ─────────────────────────────────────────────────────────────
-node_modules/
-.pnp
-.pnp.js
-.yarn/install-state.gz
-
-# ── Build outputs ─────────────────────────────────────────────────────────────
-./
-out/
-dist/
-build/
-target/
-
-# ── Environment / secrets ─────────────────────────────────────────────────────
-.env
-.env.local
-.env.*.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# ── OS / editor ───────────────────────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-.idea/
-.vscode/
-*.iml
-
 # ── Logs ──────────────────────────────────────────────────────────────────────
 logs/
 *.log
@@ -45,4 +15,46 @@ coverage/
 
 # ── Misc ──────────────────────────────────────────────────────────────────────
 *.tsbuildinfo
--env.d.ts
+*.env.d.ts
+
+# ── Node.js ────────────────────────────────────────────────────────────────────
+node_modules/
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ── Environment variables ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Next.js / Payload app ─────────────────────────────────────────────────────
+payload-app/.next/
+payload-app/out/
+payload-app/dist/
+payload-app/node_modules/
+payload-app/.env
+payload-app/.env.local
+payload-app/.env.*.local
+payload-app/next-env.d.ts
+payload-app/package-lock.json
+
+# ── Python (removed) ──────────────────────────────────────────────────────────
+backend/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/

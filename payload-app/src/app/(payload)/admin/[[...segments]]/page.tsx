@@ -1,24 +1,19 @@
-/* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
-/* DO NOT MODIFY IT BECAUSE IT COULD BE REWRITTEN AT ANY TIME. */
-import type { Metadata } from ''
-
-import config from '@payload-config'
-import { RootPage, generatePageMetadata } from '@payloadcms//views'
-import { importMap } from '../importMap'
+import { RootPage } from '@payloadcms/next/views'
+import config from '../../../../payload.config'
+import { importMap } from '../../importMap'
 
 type Args = {
-  params: Promise<{
-    segments: string[]
-  }>
-  searchParams: Promise<{
-    [key: string]: string | string[]
-  }>
+  params: Promise<{ segments: string[] }>
+  searchParams: Promise<{ [key: string]: string | string[] }>
 }
 
-export const generateMetadata = ({ params, searchParams }: Args): Promise<Metadata> =>
-  generatePageMetadata({ config, params, searchParams })
-
-const Page = ({ params, searchParams }: Args) =>
-  RootPage({ config, params, searchParams, importMap })
-
-export default Page
+export default async function Page({ params, searchParams }: Args) {
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  return RootPage({
+    config,
+    importMap,
+    params: resolvedParams,
+    searchParams: resolvedSearchParams,
+  })
+}

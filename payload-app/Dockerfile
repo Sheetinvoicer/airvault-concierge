@@ -45,8 +45,8 @@ RUN adduser --system --uid 1001 js
 
 # Copy standalone .js build output
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=js:nodejs /app/./standalone ./
-COPY --from=builder --chown=js:nodejs /app/./static ././static
+COPY --from=builder --chown=js:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=js:nodejs /app/.next/static ./.next/static
 
 # Override node_modules with the full set (includes payload CLI + tsx for migrations)
 # The standalone build embeds only what .js needs; we need payload's runtime deps too

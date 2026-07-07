@@ -6,7 +6,7 @@ export function getStripe(): Stripe {
   if (!stripeClient) {
     const key = process.env.STRIPE_SECRET_KEY ?? ''
     stripeClient = new Stripe(key, {
-      apiVersion: '2025-02-24.acacia',
+      apiVersion: '2026-06-24.dahlia',
     })
   }
   return stripeClient

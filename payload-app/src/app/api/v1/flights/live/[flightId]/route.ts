@@ -1,7 +1,7 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getRedis } from '@/lib/redis/client'
 
-export async function GET(_req: Request, { params }: { params: Promise<{ flightId: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ flightId: string }> }) {
   const { flightId } = await params
 
   const redis = getRedis()

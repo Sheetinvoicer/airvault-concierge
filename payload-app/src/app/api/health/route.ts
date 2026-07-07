@@ -1,5 +1,3 @@
-import { Response } from '/server'
-
 export const dynamic = 'force-dynamic'
 
 export async function GET() {

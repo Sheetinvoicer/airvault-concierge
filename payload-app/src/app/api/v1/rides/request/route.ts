@@ -1,4 +1,4 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
@@ -22,7 +22,7 @@ function matchVehicle(volumeLiters: number, weightLbs: number): Vehicle | undefi
   )
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { pickup, dropoff, luggage_volume, luggage_weight, passenger_id } = (await req.json()) as {
     pickup: string
     dropoff: string

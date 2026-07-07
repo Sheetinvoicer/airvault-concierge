@@ -47,7 +47,8 @@ export default function LoginPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-          className=        required
+          className="w-full p-2 border rounded"
+          required
         />
         <input
           type="password"
@@ -59,13 +60,14 @@ export default function LoginPage() {
         />
         <button
           type="submit"
-                                            Name="w                      -white py-2 rounded hover:bg                            0"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Logging in...' : 'Log In'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-c      <
-        Don't have an account? <a href="/signup" className="text-blue-600">Sign up</a>
+      <p className="mt-4 text-sm text-center">
+        Don&apos;t have an account? <a href="/signup" className="text-blue-600">Sign up</a>
       </p>
     </div>
   )

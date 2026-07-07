@@ -1,8 +1,7 @@
-import { withPayload } from '@payloadcms/next/withPayload'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const middleware = (request: NextRequest) => {
+export default function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
@@ -14,5 +13,3 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
-
-export default withPayload(middleware)

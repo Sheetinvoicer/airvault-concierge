@@ -7,7 +7,6 @@ export default function SignupPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -20,7 +19,7 @@ export default function SignupPage() {
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, confirmPassword: password, name }),
+        body: JSON.stringify({ email, password, confirmPassword: password }),
       })
 
       if (!res.ok) {
@@ -72,17 +71,6 @@ export default function SignupPage() {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Full Name</label>
-            <input
-              type="text"
-              placeholder="Jane Smith"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-              required
-            />
-          </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Email</label>
             <input

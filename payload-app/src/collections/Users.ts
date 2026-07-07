@@ -13,11 +13,5 @@ export const Users: CollectionConfig = {
     update: () => true,
     delete: () => true,
   },
-  fields: [
-    {
-      name: 'name',
-      type: 'text',
-      label: 'Full Name',
-    },
-  ],
+  fields: [],
 }

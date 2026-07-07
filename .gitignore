@@ -5,7 +5,7 @@ node_modules/
 .yarn/install-state.gz
 
 # ── Build outputs ─────────────────────────────────────────────────────────────
-.next/
+./
 out/
 dist/
 build/
@@ -45,4 +45,4 @@ coverage/
 
 # ── Misc ──────────────────────────────────────────────────────────────────────
 *.tsbuildinfo
-next-env.d.ts
+-env.d.ts

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getRedis } from '@/lib/redis/client'
 
 const CONCIERGE_FEE = 1.07
@@ -16,7 +16,7 @@ function applyConcierge(price: number): number {
   return Math.round(price * CONCIERGE_FEE * 100) / 100
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { origin, destination, departure_date } = (await req.json()) as {
     origin: string
     destination: string
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!origin || !destination || !departure_date) {
-    return NextResponse.json({ error: 'origin, destination, departure_date are required' }, { status: 400 })
+    return Response.json({ error: 'origin, destination, departure_date are required' }, { status: 400 })
   }
 
   const cacheKey = `flights:search:${origin}:${destination}:${departure_date}`
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   try {
     const cached = await redis.get(cacheKey)
     if (cached) {
-      return NextResponse.json({ flights: JSON.parse(cached), cached: true })
+      return Response.json({ flights: JSON.parse(cached), cached: true })
     }
   } catch (_) {
     // Redis down — continue without cache
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         'x-rapidapi-key': process.env.RAPIDAPI_KEY ?? '',
         'x-rapidapi-host': 'skyscanner-api.p.rapidapi.com',
       },
-      next: { revalidate: 60 },
+      : { revalidate: 60 },
     })
 
     if (!resp.ok) throw new Error(`RapidAPI responded ${resp.status}`)
@@ -89,5 +89,5 @@ export async function POST(req: NextRequest) {
     // Redis down — ignore
   }
 
-  return NextResponse.json({ flights })
+  return Response.json({ flights })
 }

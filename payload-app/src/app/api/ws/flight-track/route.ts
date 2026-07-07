@@ -1,13 +1,13 @@
 /**
  * WebSocket route — real-time flight status broadcast.
  *
- * Next.js App Router does not natively support WebSocket upgrade.
+ * .js App Router does not natively support WebSocket upgrade.
  * This route handles the upgrade manually using the Node.js `ws` library
  * via the `socket` from the underlying IncomingMessage.
  *
  * Usage: connect a WebSocket client to ws://localhost:3000/api/ws/flight-track
  */
-import { NextRequest } from 'next/server'
+import { Request } from '/server'
 import { WebSocketServer, WebSocket } from 'ws'
 
 // Module-level singleton so the WSS is created once per process
@@ -44,12 +44,12 @@ function getWss(): WebSocketServer {
   return wss
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   const rawReq = req as unknown as { socket?: import('net').Socket }
   const socket = rawReq.socket
 
   if (!socket) {
-    return new Response('WebSocket upgrade requires a raw Node.js socket. Run with Next.js server.', {
+    return new Response('WebSocket upgrade requires a raw Node.js socket. Run with .js server.', {
       status: 426,
       headers: { Upgrade: 'websocket' },
     })

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-export async function GET(req: NextRequest) {
-  const flightId = req.nextUrl.searchParams.get('flight_id')
+export async function GET(req: Request) {
+  const flightId = req.Url.searchParams.get('flight_id')
 
   const payload = await getPayload({ config })
 
@@ -14,5 +14,5 @@ export async function GET(req: NextRequest) {
     limit: 100,
   })
 
-  return NextResponse.json({ flight_id: flightId, meals: result.docs })
+  return Response.json({ flight_id: flightId, meals: result.docs })
 }

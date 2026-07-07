@@ -3,14 +3,14 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "es"
     ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
+    "module": "es",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -18,7 +18,7 @@
     "incremental": true,
     "plugins": [
       {
-        "name": "next"
+        "name": ""
       }
     ],
     "paths": {
@@ -32,11 +32,11 @@
     "target": "ES2017"
   },
   "include": [
-    "next-env.d.ts",
+    "-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "./types/**/*.ts",
+    "./dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,6 +1,6 @@
 # AirVault Concierge — Production Deployment Guide
 
-**Architecture:** PayloadCMS 3 + Next.js 15 backend on **Render** · Next.js 14 frontend on **Vercel**
+**Architecture:** PayloadCMS 3 + .js 15 backend on **Render** · .js 14 frontend on **Vercel**
 
 ```
 Browser → Vercel (frontend) → rewrites /api/* /ws/* /graphql → Render (airvault-app)
@@ -33,7 +33,7 @@ git push origin main
 Render reads `render.yaml` at the repo root and automatically provisions:
 - **`airvault-postgres`** — managed Postgres (free plan)
 - **`airvault-redis`** — managed Redis (free plan)
-- **`airvault-app`** — PayloadCMS + Next.js Docker service (starter plan, Oregon region)
+- **`airvault-app`** — PayloadCMS + .js Docker service (starter plan, Oregon region)
 
 ### 2.1 Create a new Blueprint
 
@@ -70,7 +70,7 @@ https://airvault-app.onrender.com
 1. Go to [Vercel Dashboard](https://vercel.com/new) → **Import Git Repository**
 2. Select your GitHub repo
 3. Set **Root Directory** to `frontend`
-4. Framework Preset: **Next.js** (auto-detected)
+4. Framework Preset: **.js** (auto-detected)
 
 ### 3.2 Add environment variable
 
@@ -78,7 +78,7 @@ In the Vercel project settings (or during import), add:
 
 | Variable | Value |
 |---|---|
-| `NEXT_PUBLIC_API_URL` | `https://airvault-app.onrender.com` |
+| `_PUBLIC_API_URL` | `https://airvault-app.onrender.com` |
 
 > Replace with your actual Render URL if it differs from the default.
 
@@ -104,7 +104,7 @@ The `vercel.json` rewrites automatically proxy:
 |---|---|---|
 | `CNAME` | `api` | `airvault-app.onrender.com` |
 
-3. Update `NEXT_PUBLIC_SERVER_URL` and `NEXT_PUBLIC_API_URL` env vars on Render to `https://api.yourdomain.com`
+3. Update `_PUBLIC_SERVER_URL` and `_PUBLIC_API_URL` env vars on Render to `https://api.yourdomain.com`
 
 ### Vercel (frontend)
 
@@ -116,7 +116,7 @@ The `vercel.json` rewrites automatically proxy:
 | `CNAME` | `www` | `cname.vercel-dns.com` |
 | `A` | `@` | `76.76.21.21` |
 
-3. Update `NEXT_PUBLIC_API_URL` on Vercel to `https://api.yourdomain.com`
+3. Update `_PUBLIC_API_URL` on Vercel to `https://api.yourdomain.com`
 
 ---
 
@@ -165,21 +165,21 @@ curl -X POST "$RENDER_URL/api/v1/rides/request" \
 | `STRIPE_SECRET_KEY` | **Manual** (Render dashboard) | `sk_live_...` or `sk_test_...` |
 | `RAPIDAPI_KEY` | **Manual** (Render dashboard) | Flight data API key |
 | `KAFKA_BOOTSTRAP_SERVERS` | **Manual**, optional | Upstash Kafka URL; leave blank to disable |
-| `NEXT_PUBLIC_SERVER_URL` | Auto-set by Blueprint | e.g. `https://airvault-app.onrender.com` |
-| `NEXT_PUBLIC_API_URL` | Auto-set by Blueprint | Same as `NEXT_PUBLIC_SERVER_URL` |
+| `_PUBLIC_SERVER_URL` | Auto-set by Blueprint | e.g. `https://airvault-app.onrender.com` |
+| `_PUBLIC_API_URL` | Auto-set by Blueprint | Same as `_PUBLIC_SERVER_URL` |
 
 ### Vercel — `frontend`
 
 | Variable | Value | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | `https://airvault-app.onrender.com` | Must match your Render service URL |
+| `_PUBLIC_API_URL` | `https://airvault-app.onrender.com` | Must match your Render service URL |
 
-> To add via CLI: `vercel env add NEXT_PUBLIC_API_URL production`
+> To add via CLI: `vercel env add _PUBLIC_API_URL production`
 
 ---
 
 ## Local Development
 
 For local development use Docker Compose (not covered here — see `docker-compose.yml`).
-The `payload-app/` Next.js config and `frontend/next.config.js` both define local rewrites
+The `payload-app/` .js config and `frontend/.config.js` both define local rewrites
 that proxy API traffic to `localhost:3000` / the env-configured backend URL.

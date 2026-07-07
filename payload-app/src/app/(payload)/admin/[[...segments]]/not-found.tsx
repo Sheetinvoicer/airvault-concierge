@@ -1,4 +1,4 @@
-import { NotFoundPage, generatePageMetadata } from '@payloadcms/next/views'
+import { NotFoundPage, generatePageMetadata } from '@payloadcms//views'
 
 export const generateMetadata = generatePageMetadata
 

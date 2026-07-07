@@ -105,14 +105,14 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
+      - /app/.
     environment:
-      - NEXT_PUBLIC_API_URL=http://payload-app:3000
+      - _PUBLIC_API_URL=http://payload-app:3000
     command: npm run dev
     networks:
       - airvault
 
-  # ── PayloadCMS + Next.js (production mode) ────────────────────────────────
+  # ── PayloadCMS + .js (production mode) ────────────────────────────────
   payload-app:
     build:
       context: ./payload-app
@@ -134,7 +134,7 @@ services:
       - PAYLOAD_SECRET=${PAYLOAD_SECRET:-dev-payload-secret-change-me}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_placeholder}
       - RAPIDAPI_KEY=${RAPIDAPI_KEY:-placeholder}
-      - NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+      - _PUBLIC_SERVER_URL=http://localhost:3000
       - PORT=3000
     ports:
       - "3000:3000"

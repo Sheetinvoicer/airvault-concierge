@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { flight_id, passenger_id, delay_minutes } = (await req.json()) as {
     flight_id: string
     passenger_id: string
@@ -10,14 +10,14 @@ export async function POST(req: NextRequest) {
   }
 
   if (!flight_id || !passenger_id || delay_minutes == null) {
-    return NextResponse.json(
+    return Response.json(
       { error: 'flight_id, passenger_id, and delay_minutes are required' },
       { status: 400 },
     )
   }
 
   if (delay_minutes < 60) {
-    return NextResponse.json({ error: 'Delay must be at least 60 minutes to qualify' }, { status: 422 })
+    return Response.json({ error: 'Delay must be at least 60 minutes to qualify' }, { status: 422 })
   }
 
   const payoutAmount = delay_minutes >= 240 ? 600 : 250
@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return NextResponse.json(claim, { status: 201 })
+  return Response.json(claim, { status: 201 })
 }
 
-export async function GET(req: NextRequest) {
-  const userId = req.nextUrl.searchParams.get('user_id')
+export async function GET(req: Request) {
+  const userId = req.Url.searchParams.get('user_id')
 
   const payload = await getPayload({ config })
 
@@ -55,5 +55,5 @@ export async function GET(req: NextRequest) {
     sort: '-createdAt',
   })
 
-  return NextResponse.json(result)
+  return Response.json(result)
 }

@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 
-// Singleton Redis client — reused across Next.js API routes
+// Singleton Redis client — reused across .js API routes
 let redisClient: Redis | null = null
 
 export function getRedis(): Redis {

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import crypto from 'crypto'
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { flight_id, meal_id, seat_number } = (await req.json()) as {
     flight_id: string
     meal_id: string
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!flight_id || !meal_id || !seat_number) {
-    return NextResponse.json(
+    return Response.json(
       { error: 'flight_id, meal_id, and seat_number are required' },
       { status: 400 },
     )
@@ -23,15 +23,15 @@ export async function POST(req: NextRequest) {
   try {
     const meal = await payload.findByID({ collection: 'meals', id: meal_id })
     if (!meal.available) {
-      return NextResponse.json({ error: 'Meal is not available' }, { status: 409 })
+      return Response.json({ error: 'Meal is not available' }, { status: 409 })
     }
   } catch {
-    return NextResponse.json({ error: 'Meal not found' }, { status: 404 })
+    return Response.json({ error: 'Meal not found' }, { status: 404 })
   }
 
   const bookingRef = `BK-${crypto.randomBytes(4).toString('hex').toUpperCase()}`
 
-  return NextResponse.json({
+  return Response.json({
     booking_ref: bookingRef,
     flight_id,
     meal_id,

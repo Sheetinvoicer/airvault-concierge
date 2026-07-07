@@ -1,23 +1,23 @@
 {
-  "framework": "nextjs",
+  "framework": "js",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "outputDirectory": ".",
   "rootDirectory": "frontend",
   "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url"
+    "_PUBLIC_API_URL": "@_public_api_url"
   },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "$NEXT_PUBLIC_API_URL/api/:path*"
+      "destination": "$_PUBLIC_API_URL/api/:path*"
     },
     {
       "source": "/ws/:path*",
-      "destination": "$NEXT_PUBLIC_API_URL/ws/:path*"
+      "destination": "$_PUBLIC_API_URL/ws/:path*"
     },
     {
       "source": "/graphql",
-      "destination": "$NEXT_PUBLIC_API_URL/graphql"
+      "destination": "$_PUBLIC_API_URL/graphql"
     }
   ],
   "headers": [

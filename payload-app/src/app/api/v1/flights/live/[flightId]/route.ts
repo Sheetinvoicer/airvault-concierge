@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getRedis } from '@/lib/redis/client'
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ flightId: string }> }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ flightId: string }> }) {
   const { flightId } = await params
 
   const redis = getRedis()
@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ fli
   try {
     const cached = await redis.get(cacheKey)
     if (cached) {
-      return NextResponse.json(JSON.parse(cached))
+      return Response.json(JSON.parse(cached))
     }
   } catch (_) {
     // Redis down — continue
@@ -33,5 +33,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ fli
     // Redis down — ignore
   }
 
-  return NextResponse.json(status)
+  return Response.json(status)
 }

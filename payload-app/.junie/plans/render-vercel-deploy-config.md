@@ -11,7 +11,7 @@ Simplify production infrastructure by producing clean, production-ready deployme
 ### Scope
 
 #### In Scope
-- **`render.yaml`** — remove the legacy Python `airvault-backend` service; keep and polish the `airvault-app` (PayloadCMS + Next.js), `airvault-postgres`, and `airvault-redis` resources.
+- **`render.yaml`** — remove the legacy Python `airvault-backend` service; keep and polish the `airvault-app` (PayloadCMS + .js), `airvault-postgres`, and `airvault-redis` resources.
 - **`frontend/vercel.json`** — add `rewrites` for `/api/*`, `/ws/*`, `/graphql` proxy; add all required env var references; add CORS-safe security headers.
 - **`DEPLOY.md`** — rewrite as a clean, step-by-step guide covering: git push → Render Blueprint → Vercel import → custom domains → env vars → verification.
 - **Remove / archive** the legacy `backend/` directory reference from Render config (the directory itself is kept intact but dropped from deploy).
@@ -35,7 +35,7 @@ Simplify production infrastructure by producing clean, production-ready deployme
  File | Current State | Problem |
 ------|---------------|---------|
  `/render.yaml` | Defines postgres + redis + **two** web services (`airvault-app` and `airvault-backend`) | Legacy Python backend service bloats the blueprint; shouldn't be deployed |
- `/frontend/vercel.json` | Framework + build command + one env var + security headers | Missing `rewrites` for `/api/*`, `/ws/*`, `/graphql` (those live in `next.config.js` but Vercel's edge network needs them declared in `vercel.json` to proxy correctly) |
+ `/frontend/vercel.json` | Framework + build command + one env var + security headers | Missing `rewrites` for `/api/*`, `/ws/*`, `/graphql` (those live in `.config.js` but Vercel's edge network needs them declared in `vercel.json` to proxy correctly) |
  `/DEPLOY.md` | Comprehensive but mixes old Python backend notes, mentions Kafka prominently | Needs streamlining for the Render + Vercel dual-service setup |
  `/backend/` directory | Python FastAPI source; referenced in current `render.yaml` | Should be dropped from the `render.yaml` blueprint (source kept locally) |
 
@@ -59,17 +59,17 @@ graph LR
 - Ensure all env vars align with `payload.config.ts` expectations (`DATABASE_URI`, `REDIS_URL`, `PAYLOAD_SECRET`, etc.).
 
 #### `frontend/vercel.json`
-- Add a `rewrites` array to proxy `/api/:path*`, `/ws/:path*`, and `/graphql` to `$NEXT_PUBLIC_API_URL` (Render service URL).
-- Add `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SERVER_URL` as Vercel environment variable references.
+- Add a `rewrites` array to proxy `/api/:path*`, `/ws/:path*`, and `/graphql` to `$_PUBLIC_API_URL` (Render service URL).
+- Add `_PUBLIC_API_URL` and `_PUBLIC_SERVER_URL` as Vercel environment variable references.
 - Retain the existing security headers (`X-Frame-Options`, `X-Content-Type-Options`).
-- Set `"framework": "nextjs"`, `"buildCommand": "npm run build"`, `"outputDirectory": ".next"`.
+- Set `"framework": "js"`, `"buildCommand": "npm run build"`, `"outputDirectory": "."`.
 
-> **Note:** `frontend/next.config.js` already defines `rewrites()` for local dev. In production on Vercel, `vercel.json` rewrites take precedence and handle the proxying — both can coexist.
+> **Note:** `frontend/.config.js` already defines `rewrites()` for local dev. In production on Vercel, `vercel.json` rewrites take precedence and handle the proxying — both can coexist.
 
 #### `DEPLOY.md` (root of repo)
 - **Step 1** — Push repo to GitHub.
 - **Step 2** — Render Blueprint (detect `render.yaml`, provision Postgres + Redis + `airvault-app`, fill in manual secrets).
-- **Step 3** — Vercel import (connect `frontend/` subdirectory, set `NEXT_PUBLIC_API_URL` to Render URL).
+- **Step 3** — Vercel import (connect `frontend/` subdirectory, set `_PUBLIC_API_URL` to Render URL).
 - **Step 4** — Custom domains (optional CNAME setup).
 - **Step 5** — Verification curl commands.
 - Include env vars reference table.
@@ -99,21 +99,21 @@ No files are created or deleted. No app source files are touched.
  `STRIPE_SECRET_KEY` | Manual (Render dashboard) | `sk_live_...` or `sk_test_...` |
  `RAPIDAPI_KEY` | Manual (Render dashboard) | Flight data API |
  `KAFKA_BOOTSTRAP_SERVERS` | Optional (leave blank to disable) | Upstash Kafka URL |
- `NEXT_PUBLIC_SERVER_URL` | Set to Render URL | e.g. `https://airvault-app.onrender.com` |
- `NEXT_PUBLIC_API_URL` | Same as above | Used by PayloadCMS config |
+ `_PUBLIC_SERVER_URL` | Set to Render URL | e.g. `https://airvault-app.onrender.com` |
+ `_PUBLIC_API_URL` | Same as above | Used by PayloadCMS config |
 
 ### Vercel (`frontend`) Environment Variables
 
  Variable | Value | Notes |
 ---|---|---|
- `NEXT_PUBLIC_API_URL` | `https://airvault-app.onrender.com` | Must match Render service URL |
+ `_PUBLIC_API_URL` | `https://airvault-app.onrender.com` | Must match Render service URL |
 
 > Add via Vercel dashboard → Project → Settings → Environment Variables, or via `vercel env add`.
 
 # Delivery Steps
 
 ### ✓ Step 1: Update render.yaml — remove legacy Python backend service
-The root `render.yaml` declares only the three correct resources: `airvault-postgres`, `airvault-redis`, and `airvault-app` (PayloadCMS + Next.js).
+The root `render.yaml` declares only the three correct resources: `airvault-postgres`, `airvault-redis`, and `airvault-app` (PayloadCMS + .js).
 
 - Remove the entire `airvault-backend` service block (Python FastAPI — Docker build from `./backend/Dockerfile`).
 - Add `region: oregon` to `airvault-app` for explicitness.
@@ -124,10 +124,10 @@ The root `render.yaml` declares only the three correct resources: `airvault-post
 The `frontend/vercel.json` is updated so Vercel's edge network properly proxies API, WebSocket, and GraphQL traffic to the Render backend.
 
 - Add a `rewrites` array with three rules:
-  - `/api/:path*` → `$NEXT_PUBLIC_API_URL/api/:path*`
-  - `/ws/:path*` → `$NEXT_PUBLIC_API_URL/ws/:path*`
-  - `/graphql` → `$NEXT_PUBLIC_API_URL/graphql`
-- Ensure `NEXT_PUBLIC_API_URL` is declared as a Vercel environment variable reference (`@next_public_api_url`).
+  - `/api/:path*` → `$_PUBLIC_API_URL/api/:path*`
+  - `/ws/:path*` → `$_PUBLIC_API_URL/ws/:path*`
+  - `/graphql` → `$_PUBLIC_API_URL/graphql`
+- Ensure `_PUBLIC_API_URL` is declared as a Vercel environment variable reference (`@_public_api_url`).
 - Retain existing `framework`, `buildCommand`, `outputDirectory`, and security headers.
 - Confirm `rootDirectory` is set to `frontend` (so Vercel builds from the correct subdirectory when the full monorepo is connected).
 
@@ -136,7 +136,7 @@ The root `DEPLOY.md` is fully rewritten to reflect the final two-platform archit
 
 - **Step 1 — Push to GitHub:** `git add . && git commit && git push`.
 - **Step 2 — Render Blueprint:** New → Blueprint → connect repo → Render auto-provisions Postgres, Redis, and `airvault-app` → fill in `STRIPE_SECRET_KEY`, `RAPIDAPI_KEY` in the Render dashboard → note the service URL.
-- **Step 3 — Vercel import:** Import the repo on Vercel → set Root Directory to `frontend` → add `NEXT_PUBLIC_API_URL` env var → deploy.
+- **Step 3 — Vercel import:** Import the repo on Vercel → set Root Directory to `frontend` → add `_PUBLIC_API_URL` env var → deploy.
 - **Step 4 — Custom domains (optional):** CNAME setup table for both Render and Vercel.
 - **Step 5 — Verification:** curl commands for `/api/health`, `/admin`, `/api/graphql`, `/api/v1/flights/search`, `/api/v1/meals`, `/api/v1/rides/request`.
 - Include the env vars reference table for both platforms.

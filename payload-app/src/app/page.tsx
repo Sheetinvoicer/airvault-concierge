@@ -4,7 +4,7 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-4">✈️ AirVault Concierge</h1>
       <p className="text-gray-400 mb-8 text-center max-w-md">
         Last-minute flights, delay compensation, ride-hailing, pet travel, and in-flight meals —
-        all powered by PayloadCMS + Next.js.
+        all powered by PayloadCMS + .js.
       </p>
       <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
         <a

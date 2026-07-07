@@ -1,8 +1,8 @@
-import { withPayload } from '@payloadcms/next/withPayload'
-import type { NextConfig } from 'next'
+import { withPayload } from '@payloadcms//withPayload'
+import type { Config } from ''
 import path from 'path'
 
-const nextConfig: NextConfig = {
+const Config: Config = {
   output: 'standalone',
 
   // 👇 Add this to fix the root detection
@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/ws/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL ?? ''}/ws/:path*`,
+        destination: `${process.env._PUBLIC_API_URL ?? ''}/ws/:path*`,
       },
     ]
   },
@@ -29,4 +29,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(nextConfig)
+export default withPayload(Config)

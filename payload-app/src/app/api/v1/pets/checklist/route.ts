@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { getRedis } from '@/lib/redis/client'
@@ -83,7 +83,7 @@ async function generatePdf(
   return pdfDoc.save()
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { origin, destination, owner_name, pet_name } = (await req.json()) as {
     origin: string
     destination: string
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!origin || !destination || !owner_name || !pet_name) {
-    return NextResponse.json(
+    return Response.json(
       { error: 'origin, destination, owner_name, pet_name are required' },
       { status: 400 },
     )

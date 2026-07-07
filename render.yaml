@@ -48,8 +48,8 @@ services:
         value: re_dfB8WzcC_EnUkmJZPKTgyGaiAMq3kFo1C
       - key: RESEND_FROM_EMAIL
         value: noreply@sheetinvoicer.com
-      - key: NEXT_PUBLIC_SERVER_URL
+      - key: _PUBLIC_SERVER_URL
         value: https://airvault-app.onrender.com
-      - key: NEXT_PUBLIC_API_URL
+      - key: _PUBLIC_API_URL
         value: https://airvault-app.onrender.com
 

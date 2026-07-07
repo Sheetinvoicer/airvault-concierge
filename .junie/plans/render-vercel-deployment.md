@@ -15,7 +15,7 @@ Migrate AirVault Concierge from a local Docker Compose setup (with planned AWS E
 - Fix `backend/Dockerfile` to honour Render's dynamic `$PORT` env variable
 - Create `render.yaml` (Render Blueprint) defining the web service, managed Postgres, and Redis
 - Update `backend/app/config.py` to make Kafka optional (Upstash Kafka or graceful no-op) so the app doesn't crash without a full Kafka cluster
-- Create `frontend/next.config.js` with `output: 'standalone'` and API rewrites
+- Create `frontend/.config.js` with `output: 'standalone'` and API rewrites
 - Create `frontend/vercel.json` with build settings and env var declarations
 - Create root-level `.env.example` documenting all required production variables
 - Produce a complete step-by-step deployment guide (DNS, env vars, copy-paste commands)
@@ -29,13 +29,13 @@ Migrate AirVault Concierge from a local Docker Compose setup (with planned AWS E
 
 ### User Stories
 - As a developer, I want to deploy the full AirVault backend to Render with one blueprint file so that I don't manually configure each service.
-- As a developer, I want to deploy the Next.js frontend to Vercel with a single `vercel.json` so that build and routing are handled automatically.
+- As a developer, I want to deploy the .js frontend to Vercel with a single `vercel.json` so that build and routing are handled automatically.
 - As an operator, I want a checklist of live endpoint tests so that I can confirm the deployment is healthy.
 
 ### Functional Requirements
 - All existing REST endpoints (`/api/v1/flights`, `/api/v1/claims`, `/api/v1/rides`, `/api/v1/pets`), WebSocket (`/ws`), and GraphQL (`/graphql`) must work after deployment.
 - Backend must start successfully even without a Kafka broker (graceful skip of consumer startup).
-- Frontend must proxy API calls to the Render backend URL via Next.js rewrites.
+- Frontend must proxy API calls to the Render backend URL via .js rewrites.
 - Custom domains `api.awsaftrading.com` → Render and `app.awsaftrading.com` → Vercel must be documented.
 
 
@@ -47,7 +47,7 @@ Migrate AirVault Concierge from a local Docker Compose setup (with planned AWS E
 -----------|---------------|
  `backend/Dockerfile` | Uses hardcoded `--port 8000`; Render requires `$PORT` |
  `backend/app/config.py` | `KAFKA_BOOTSTRAP_SERVERS` is a **required** field — app crashes without it |
- `frontend/next.config.js` | Empty file — no `output`, no rewrites |
+ `frontend/.config.js` | Empty file — no `output`, no rewrites |
  `frontend/vercel.json` | Does not exist |
  `render.yaml` | Does not exist |
  `.env.example` | Does not exist |
@@ -57,8 +57,8 @@ Migrate AirVault Concierge from a local Docker Compose setup (with planned AWS E
 
 1. **Render managed Redis vs Upstash** — Use Render's native Redis instance in `render.yaml` for zero-configuration. Upstash can be substituted by swapping `REDIS_URL`.
 2. **Kafka strategy** — Make `KAFKA_BOOTSTRAP_SERVERS` optional in `config.py` (default `None`). Wrap Kafka consumer startup in a try/except so the app boots without Kafka. Upstash Kafka (managed) can be wired in later by setting the env var.
-3. **Frontend deployment mode** — Use `output: 'standalone'` in `next.config.js` + Vercel's native Next.js support (no custom server needed).
-4. **API proxying** — Next.js `rewrites` in `next.config.js` forward `/api/**` and `/ws/**` to `NEXT_PUBLIC_API_URL` so the frontend never has CORS issues in production.
+3. **Frontend deployment mode** — Use `output: 'standalone'` in `.config.js` + Vercel's native .js support (no custom server needed).
+4. **API proxying** — .js `rewrites` in `.config.js` forward `/api/**` and `/ws/**` to `_PUBLIC_API_URL` so the frontend never has CORS issues in production.
 
 ### Proposed Changes
 
@@ -100,30 +100,30 @@ settings = Settings()
 #### `backend/app/main.py` (lifespan update)
 Wrap Kafka consumer registration in `if settings.KAFKA_BOOTSTRAP_SERVERS:` guard.
 
-#### `frontend/next.config.js`
+#### `frontend/.config.js`
 ```js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+/** @type {import('').Config} */
+const Config = {
   output: 'standalone',
   async rewrites() {
     return [
-      { source: '/api/:path*', destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*` },
-      { source: '/ws/:path*',  destination: `${process.env.NEXT_PUBLIC_API_URL}/ws/:path*` },
-      { source: '/graphql',    destination: `${process.env.NEXT_PUBLIC_API_URL}/graphql` },
+      { source: '/api/:path*', destination: `${process.env._PUBLIC_API_URL}/api/:path*` },
+      { source: '/ws/:path*',  destination: `${process.env._PUBLIC_API_URL}/ws/:path*` },
+      { source: '/graphql',    destination: `${process.env._PUBLIC_API_URL}/graphql` },
     ];
   },
 };
-export default nextConfig;
+export default Config;
 ```
 
 #### `frontend/vercel.json` (new file)
 ```json
 {
-  "framework": "nextjs",
+  "framework": "js",
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "outputDirectory": ".",
   "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url"
+    "_PUBLIC_API_URL": "@_public_api_url"
   },
   "headers": [
     {
@@ -184,7 +184,7 @@ RAPIDAPI_KEY=...
 JWT_SECRET=replace-with-random-64-char-string
 
 # --- Frontend (Vercel) ---
-NEXT_PUBLIC_API_URL=https://api.awsaftrading.com
+_PUBLIC_API_URL=https://api.awsaftrading.com
 ```
 
 ### Architecture Diagram
@@ -192,7 +192,7 @@ NEXT_PUBLIC_API_URL=https://api.awsaftrading.com
 ```mermaid
 graph TD
     Browser["Browser / Mobile"]
-    Vercel["Vercel\n(Next.js frontend)\napp.awsaftrading.com"]
+    Vercel["Vercel\n(.js frontend)\napp.awsaftrading.com"]
     Render["Render Web Service\n(FastAPI backend)\napi.awsaftrading.com"]
     PG["Render Managed\nPostgres"]
     Redis["Render Managed\nRedis"]
@@ -223,7 +223,7 @@ airvault-concierge/
 │       ├── config.py            ← MODIFIED (Kafka optional, JWT_SECRET)
 │       └── main.py              ← MODIFIED (Kafka guard in lifespan)
 └── frontend/
-    ├── next.config.js           ← MODIFIED (standalone + rewrites)
+    ├── .config.js           ← MODIFIED (standalone + rewrites)
     ├── vercel.json              ← NEW
     └── ...
 ```
@@ -285,7 +285,7 @@ Or via Vercel dashboard:
 2. Set **Root Directory**: `frontend`.
 3. Add environment variable:
    ```
-   NEXT_PUBLIC_API_URL = https://api.awsaftrading.com
+   _PUBLIC_API_URL = https://api.awsaftrading.com
    ```
 4. Click **Deploy**.
 
@@ -312,7 +312,7 @@ Add both custom domains in their respective dashboards (Render → Settings → 
  `RAPIDAPI_KEY` | Render (manual) | RapidAPI flight data key |
  `JWT_SECRET` | Render (auto-generated) | 64-char random string |
  `KAFKA_BOOTSTRAP_SERVERS` | Render (optional) | Upstash Kafka URL or leave blank |
- `NEXT_PUBLIC_API_URL` | Vercel | `https://api.awsaftrading.com` |
+ `_PUBLIC_API_URL` | Vercel | `https://api.awsaftrading.com` |
 
 ---
 
@@ -366,11 +366,11 @@ A single `render.yaml` at the repo root lets Render provision all services autom
 - Set `healthCheckPath: /health` on the web service so Render knows when the deployment is healthy.
 - Create `.env.example` at the repo root listing every required variable with placeholder values and inline comments, covering both backend (Render) and frontend (Vercel) variables.
 
-### ✓ Step 3: Configure Next.js frontend for Vercel deployment
-Frontend builds as a standalone Next.js app on Vercel and proxies all backend traffic without CORS issues.
+### ✓ Step 3: Configure .js frontend for Vercel deployment
+Frontend builds as a standalone .js app on Vercel and proxies all backend traffic without CORS issues.
 
-- Rewrite `frontend/next.config.js` (currently empty) with `output: 'standalone'` and `async rewrites()` mapping `/api/**`, `/ws/**`, and `/graphql` to `process.env.NEXT_PUBLIC_API_URL`.
-- Create `frontend/vercel.json` declaring `framework: 'nextjs'`, the build command, output directory, `NEXT_PUBLIC_API_URL` env var reference, and a security header (`X-Frame-Options: DENY`).
+- Rewrite `frontend/.config.js` (currently empty) with `output: 'standalone'` and `async rewrites()` mapping `/api/**`, `/ws/**`, and `/graphql` to `process.env._PUBLIC_API_URL`.
+- Create `frontend/vercel.json` declaring `framework: 'js'`, the build command, output directory, `_PUBLIC_API_URL` env var reference, and a security header (`X-Frame-Options: DENY`).
 
 ### ✓ Step 4: Write the deployment guide and verification checklist
 Operators can deploy end-to-end in under 1 hour using documented, copy-paste steps.
@@ -379,12 +379,12 @@ Operators can deploy end-to-end in under 1 hour using documented, copy-paste ste
 
 ---
 
-# PayloadCMS + Next.js Monorepo Migration
+# PayloadCMS + .js Monorepo Migration
 
-Rebuild the Python FastAPI backend as a unified Next.js + PayloadCMS monorepo.
-Architecture: single Next.js 15 app with PayloadCMS embedded, Postgres (Drizzle), Redis (ioredis), kafkajs for delay events.
+Rebuild the Python FastAPI backend as a unified .js + PayloadCMS monorepo.
+Architecture: single .js 15 app with PayloadCMS embedded, Postgres (Drizzle), Redis (ioredis), kafkajs for delay events.
 
-### ✓ Step 5: Scaffold PayloadCMS + Next.js monorepo
+### ✓ Step 5: Scaffold PayloadCMS + .js monorepo
 Bootstrap the `payload-app/` directory with `create-payload-app`, configure Postgres adapter, and port env vars.
 
 - Run `npx create-payload-app@latest payload-app` with `--template blank --db postgres` flags (non-interactive).
@@ -401,8 +401,8 @@ Port all six Python SQLAlchemy models to TypeScript PayloadCMS collection config
 - Create `PetChecklists` collection (origin, destination, owner, petName, generatedAt).
 - Create `Meals` collection (name, description, available) — used by GraphQL.
 
-### ✓ Step 7: Implement business logic as Next.js API routes + PayloadCMS hooks
-Port all five route groups and services to Next.js App Router API routes + Payload hooks/endpoints.
+### ✓ Step 7: Implement business logic as .js API routes + PayloadCMS hooks
+Port all five route groups and services to .js App Router API routes + Payload hooks/endpoints.
 
 - `app/api/v1/flights/search/route.ts` — RapidAPI call + 7% concierge fee, Redis cache.
 - `app/api/v1/flights/live/[flightId]/route.ts` — flight status with 30s Redis TTL.
@@ -414,10 +414,10 @@ Port all five route groups and services to Next.js App Router API routes + Paylo
 - Kafka consumer (`lib/kafka/consumer.ts`) started as a global singleton that triggers claim processing on `flight-delays` topic.
 
 ### ✓ Step 8: Migrate frontend pages into the monorepo and update docker-compose
-Move existing Next.js frontend pages into `payload-app/` and update docker-compose to remove Python backend.
+Move existing .js frontend pages into `payload-app/` and update docker-compose to remove Python backend.
 
 - Copy `frontend/app/` and `frontend/components/` pages into `payload-app/app/` (non-colliding paths).
-- Update `payload-app/next.config.ts` with `output: 'standalone'` and socket rewrites.
+- Update `payload-app/.config.ts` with `output: 'standalone'` and socket rewrites.
 - Replace `backend` service in `docker-compose.yml` with a `payload-app` Node.js service.
 - Update `render.yaml` to point `dockerfilePath` to `./payload-app/Dockerfile`.
 - Update `.env.example` and `DEPLOY.md` to reflect the new stack.

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { Request, Response } from '/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
@@ -22,7 +22,7 @@ function matchVehicle(volumeLiters: number, weightLbs: number): Vehicle | undefi
   )
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { pickup, dropoff, luggage_volume, luggage_weight, passenger_id } = (await req.json()) as {
     pickup: string
     dropoff: string
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!pickup || !dropoff || luggage_volume == null || luggage_weight == null) {
-    return NextResponse.json(
+    return Response.json(
       { error: 'pickup, dropoff, luggage_volume, and luggage_weight are required' },
       { status: 400 },
     )
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   const matched = matchVehicle(luggage_volume, luggage_weight)
   if (!matched) {
-    return NextResponse.json({ error: 'No vehicle matches luggage requirements' }, { status: 400 })
+    return Response.json({ error: 'No vehicle matches luggage requirements' }, { status: 400 })
   }
 
   // Add convenience fee: $0.50 per lb over 20 lbs
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  return NextResponse.json(
+  return Response.json(
     {
       ride_id: ride.id,
       vehicle: matched.name,

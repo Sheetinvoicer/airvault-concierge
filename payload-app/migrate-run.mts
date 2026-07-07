@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
-// ── 1. Load .env manually (avoids @next/env CJS/ESM interop bug in tsx) ──────
+// ── 1. Load .env manually (avoids @/env CJS/ESM interop bug in tsx) ──────
 try {
   const envFile = readFileSync(resolve(__dirname, '.env'), 'utf8')
   for (const line of envFile.split('\n')) {
@@ -25,18 +25,18 @@ try {
   console.warn('[migrate] No .env file found — relying on environment variables already set')
 }
 
-// ── 2. Fix @next/env CJS interop (module sets __esModule:true but default:undefined) ─
-// Pre-require and patch the module so `import nextEnvImport from '@next/env'` in
+// ── 2. Fix @/env CJS interop (module sets __esModule:true but default:undefined) ─
+// Pre-require and patch the module so `import EnvImport from '@/env'` in
 // payload/dist/bin/loadEnv.js gets a valid .default (the exports object itself).
 const require = createRequire(import.meta.url)
-const nextEnvPath = require.resolve('@next/env')
-const nextEnv = require(nextEnvPath)
-if (nextEnv && nextEnv.__esModule && nextEnv.default === undefined) {
+const EnvPath = require.resolve('@/env')
+const Env = require(EnvPath)
+if (Env && Env.__esModule && Env.default === undefined) {
   // Webpack bundles set __esModule:true but forget to set .default — fix it
-  nextEnv.default = nextEnv
+  Env.default = Env
   // Also patch the require cache entry directly so loadEnv.js gets the fixed version
-  if (require.cache[nextEnvPath]) {
-    require.cache[nextEnvPath]!.exports.default = nextEnv
+  if (require.cache[EnvPath]) {
+    require.cache[EnvPath]!.exports.default = Env
   }
 }
 

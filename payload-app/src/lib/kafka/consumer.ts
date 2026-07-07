@@ -4,7 +4,7 @@
  * Consumes messages from the `flight-delays` topic and auto-creates a Claim
  * via the PayloadCMS local API when a flight is delayed ≥ 60 minutes.
  *
- * Started once as a global singleton from the Next.js instrumentation hook
+ * Started once as a global singleton from the .js instrumentation hook
  * (`src/instrumentation.ts`) so it runs only in the Node.js server process.
  */
 import type { BasePayload } from 'payload'

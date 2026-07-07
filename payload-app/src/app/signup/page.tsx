@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -45,11 +43,11 @@ export default function SignupPage() {
 
       if (!loginRes.ok) {
         setError('Account created but login failed. Please log in manually.')
-        router.push('/login')
+        window.location.href = '/login'
         return
       }
 
-      router.push('/dashboard')
+      window.location.href = '/dashboard'
     } catch (err) {
       setError('Something went wrong. Please try again.')
     } finally {

@@ -1,8 +1,15 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
+import path from 'path'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+
+  // 👇 Add this to fix the root detection
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+
   async rewrites() {
     return [
       {
@@ -13,8 +20,6 @@ const nextConfig: NextConfig = {
   },
   webpack(config, { isServer }) {
     if (isServer) {
-      // Monaco Editor is browser-only; stub it out on the server to prevent
-      // SSR crashes ("window is not defined", worker errors) during build/deploy.
       config.resolve.alias = {
         ...config.resolve.alias,
         'monaco-editor': false,

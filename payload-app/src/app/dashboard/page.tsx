@@ -55,13 +55,18 @@ export default async function DashboardPage() {
   }
 
   // Fetch last 5 claims
-  const claimsResult = await payload.find({
-    collection: 'claims',
-    where: { passengerId: { equals: userId } },
-    limit: 5,
-    sort: '-createdAt',
-  })
-  const recentClaims = claimsResult.docs as unknown as Claim[]
+  let recentClaims: Claim[] = []
+  try {
+    const claimsResult = await payload.find({
+      collection: 'claims',
+      where: { passengerId: { equals: userId } },
+      limit: 5,
+      sort: '-createdAt',
+    })
+    recentClaims = claimsResult.docs as unknown as Claim[]
+  } catch (err) {
+    console.error('[dashboard] Failed to fetch claims:', err)
+  }
 
   return (
     <div className="bg-gray-950 min-h-screen text-white px-6 py-12">

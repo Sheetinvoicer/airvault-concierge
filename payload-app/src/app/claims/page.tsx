@@ -48,14 +48,18 @@ export default async function ClaimsPage() {
   }
 
   // Fetch the user's claims server-side
-  const claimsResult = await payload.find({
-    collection: 'claims',
-    where: { passengerId: { equals: userId } },
-    limit: 20,
-    sort: '-createdAt',
-  })
-
-  const claims = claimsResult.docs as unknown as Claim[]
+  let claims: Claim[] = []
+  try {
+    const claimsResult = await payload.find({
+      collection: 'claims',
+      where: { passengerId: { equals: userId } },
+      limit: 20,
+      sort: '-createdAt',
+    })
+    claims = claimsResult.docs as unknown as Claim[]
+  } catch (err) {
+    console.error('[claims] Failed to fetch claims:', err)
+  }
 
   return (
     <div className="bg-gray-950 min-h-screen text-white px-6 py-12">

@@ -1,23 +1,18 @@
-import { withPayload } from '@payloadcms//withPayload'
-import type { Config } from ''
-import path from 'path'
+import { withPayload } from '@payloadcms/next/withPayload'
+import type { NextConfig } from 'next'
 
-const Config: Config = {
+const nextConfig: NextConfig = {
   output: 'standalone',
-
-  // 👇 Add this to fix the root detection
-  turbopack: {
-    root: path.resolve(__dirname),
-  },
 
   async rewrites() {
     return [
       {
         source: '/ws/:path*',
-        destination: `${process.env._PUBLIC_API_URL ?? ''}/ws/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL ?? ''}/ws/:path*`,
       },
     ]
   },
+
   webpack(config, { isServer }) {
     if (isServer) {
       config.resolve.alias = {
@@ -29,4 +24,4 @@ const Config: Config = {
   },
 }
 
-export default withPayload(Config)
+export default withPayload(nextConfig)

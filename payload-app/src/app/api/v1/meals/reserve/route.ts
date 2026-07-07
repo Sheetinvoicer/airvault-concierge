@@ -1,9 +1,9 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import crypto from 'crypto'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { flight_id, meal_id, seat_number } = (await req.json()) as {
     flight_id: string
     meal_id: string

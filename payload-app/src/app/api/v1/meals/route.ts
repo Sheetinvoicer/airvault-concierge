@@ -1,9 +1,9 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-export async function GET(req: Request) {
-  const flightId = req.Url.searchParams.get('flight_id')
+export async function GET(req: NextRequest) {
+  const flightId = new URL(req.url).searchParams.get('flight_id')
 
   const payload = await getPayload({ config })
 

@@ -33,7 +33,10 @@ export default function SignupPage() {
       const loginRes = await fetch('/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, passw        body: JSON.stringify({oginRes.ok) {
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (!loginRes.ok) {
         setError('Account created but login failed. Please log in manually.')
         router.push('/login')
         return
@@ -43,11 +46,13 @@ export default function SignupPage() {
     } catch (err) {
       setError('Something went wrong. Please try again.')
     } finally {
-      setLoa      setLoa      s }
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="max-w-md mx-auto mt-16 p-6 border rounded-lg shadow">
-      <h1 className  text-2xl font-bold mb-4">Sign Up</h1>
+      <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
       {error && <p className="text-red-600 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -67,7 +72,11 @@ export default function SignupPage() {
           required
         />
         <input
-                                                                         e={passwo                        (e) => setPassword(e.target.va                           w-full p-2 border rounded"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border rounded"
           required
         />
         <button

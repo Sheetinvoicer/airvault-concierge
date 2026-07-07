@@ -8,12 +8,10 @@ type Args = {
 }
 
 export default async function Page({ params, searchParams }: Args) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
   return RootPage({
     config,
     importMap,
-    params: resolvedParams,
-    searchParams: resolvedSearchParams,
+    params,
+    searchParams,
   })
 }

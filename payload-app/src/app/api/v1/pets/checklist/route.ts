@@ -1,4 +1,4 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { getRedis } from '@/lib/redis/client'
@@ -83,7 +83,7 @@ async function generatePdf(
   return pdfDoc.save()
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { origin, destination, owner_name, pet_name } = (await req.json()) as {
     origin: string
     destination: string

@@ -7,7 +7,7 @@
  *
  * Usage: connect a WebSocket client to ws://localhost:3000/api/ws/flight-track
  */
-import { Request } from '/server'
+import { type NextRequest } from 'next/server'
 import { WebSocketServer, WebSocket } from 'ws'
 
 // Module-level singleton so the WSS is created once per process
@@ -44,7 +44,7 @@ function getWss(): WebSocketServer {
   return wss
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const rawReq = req as unknown as { socket?: import('net').Socket }
   const socket = rawReq.socket
 

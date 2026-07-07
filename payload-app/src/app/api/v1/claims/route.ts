@@ -1,8 +1,8 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { flight_id, passenger_id, delay_minutes } = (await req.json()) as {
     flight_id: string
     passenger_id: string
@@ -39,8 +39,8 @@ export async function POST(req: Request) {
   return Response.json(claim, { status: 201 })
 }
 
-export async function GET(req: Request) {
-  const userId = req.Url.searchParams.get('user_id')
+export async function GET(req: NextRequest) {
+  const userId = new URL(req.url).searchParams.get('user_id')
 
   const payload = await getPayload({ config })
 

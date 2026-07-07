@@ -1,4 +1,4 @@
-import { Request, Response } from '/server'
+import { type NextRequest } from 'next/server'
 import { getRedis } from '@/lib/redis/client'
 
 const CONCIERGE_FEE = 1.07
@@ -16,7 +16,7 @@ function applyConcierge(price: number): number {
   return Math.round(price * CONCIERGE_FEE * 100) / 100
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const { origin, destination, departure_date } = (await req.json()) as {
     origin: string
     destination: string
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         'x-rapidapi-key': process.env.RAPIDAPI_KEY ?? '',
         'x-rapidapi-host': 'skyscanner-api.p.rapidapi.com',
       },
-      : { revalidate: 60 },
+      next: { revalidate: 60 },
     })
 
     if (!resp.ok) throw new Error(`RapidAPI responded ${resp.status}`)

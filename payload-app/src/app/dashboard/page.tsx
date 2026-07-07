@@ -4,7 +4,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 export default async function DashboardPage() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const token = cookieStore.get('payload-token')?.value
 
   if (!token) {
@@ -13,7 +13,8 @@ export default async function DashboardPage() {
 
   const payload = await getPayload({ config })
   try {
-    const user = await payload.auth({ headers: { cookie: `payload-token=${token}` } })
+    const authResult = await payload.auth({ headers: new Headers({ cookie: `payload-token=${token}` }) })
+    const user = authResult.user
     if (!user) {
       redirect('/login')
     }
@@ -28,10 +29,12 @@ export default async function DashboardPage() {
             type="submit"
             className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
           >
-                                     >
+            Log Out
+          </button>
         </form>
       </div>
     )
-  } catch (  } catch (  } catch (  } catch
+  } catch {
+    redirect('/login')
   }
 }

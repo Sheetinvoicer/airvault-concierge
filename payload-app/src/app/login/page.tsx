@@ -58,8 +58,10 @@ export default function LoginPage() {
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Email</label>
+            <label htmlFor="email" className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Email</label>
             <input
+              id="email"
+              name="email"
               type="email"
               placeholder="you@example.com"
               value={email}
@@ -69,8 +71,10 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Password</label>
+            <label htmlFor="password" className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">Password</label>
             <input
+              id="password"
+              name="password"
               type="password"
               placeholder="••••••••"
               value={password}

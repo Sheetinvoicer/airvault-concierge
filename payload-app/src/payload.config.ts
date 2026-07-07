@@ -1,5 +1,5 @@
 import { resendAdapter } from '@payloadcms/email-resend'
-import { postgresAdapter } from '@payloadcms/db-postgres'  // ✅ Changed from sqliteAdapter
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -28,9 +28,9 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: postgresAdapter({                    // ✅ Changed from sqliteAdapter
-    pool: {
-      connectionString: process.env.DATABASE_URI ?? '',
+  db: sqliteAdapter({
+    client: {
+      url: process.env.DATABASE_URI ?? 'file:./database.db',
     },
   }),
   sharp,

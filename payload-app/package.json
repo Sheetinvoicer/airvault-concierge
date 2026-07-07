@@ -10,7 +10,9 @@
     "generate:graphQLSchema": "payload generate:graphQLSchema",
     "payload": "payload",
     "migrate": "node ./migrate.mjs",
-    "db:push": "node ./db-push.mjs"
+    "db:push": "node ./db-push.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.85.0",
@@ -36,11 +38,17 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.3.9",
-    "typescript": "^5.7.2"
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   }
 }

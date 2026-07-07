@@ -25,6 +25,7 @@ export const Claims: CollectionConfig = {
     update: () => true,
     delete: () => true,
   },
+
   fields: [
     {
       name: 'flightId',

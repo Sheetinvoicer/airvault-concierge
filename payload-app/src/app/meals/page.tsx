@@ -2,6 +2,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import MealReserveForm from './MealReserveForm'
 
+export const dynamic = 'force-dynamic'
+
 interface Meal {
   id: string
   name: string

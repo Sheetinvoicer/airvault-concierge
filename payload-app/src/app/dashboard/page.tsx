@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+export const dynamic = 'force-dynamic'
+
 interface Claim {
   id: string
   flightId: string

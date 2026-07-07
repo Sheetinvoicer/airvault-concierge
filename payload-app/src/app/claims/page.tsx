@@ -4,6 +4,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import ClaimForm from './ClaimForm'
 
+export const dynamic = 'force-dynamic'
+
 interface Claim {
   id: string
   flightId: string

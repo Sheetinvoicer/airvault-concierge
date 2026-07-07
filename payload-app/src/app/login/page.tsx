@@ -23,8 +23,16 @@ export default function LoginPage() {
       })
 
       if (!res.ok) {
-        const data = await res.json()
-        setError(data.message || 'Login failed')
+        let msg = 'Login failed'
+        try {
+          const data = await res.json()
+          if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+            msg = data.errors.map((e: { message?: string }) => e.message).filter(Boolean).join(', ') || data.message || msg
+          } else {
+            msg = data.message || msg
+          }
+        } catch {}
+        setError(msg)
         setLoading(false)
         return
       }

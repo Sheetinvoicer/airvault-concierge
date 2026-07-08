@@ -5,7 +5,7 @@ import { useState } from 'react'
 interface ClaimResult {
   id: string
   flightId: string
-  passengerId: string
+  passenger: string | { id: string; email: string }
   delayMinutes: number
   payoutAmount: number
   status: string
@@ -13,7 +13,6 @@ interface ClaimResult {
 
 export default function ClaimForm() {
   const [flightId, setFlightId] = useState('')
-  const [passengerId, setPassengerId] = useState('')
   const [delayMinutes, setDelayMinutes] = useState('')
   const [result, setResult] = useState<ClaimResult | null>(null)
   const [error, setError] = useState('')
@@ -26,12 +25,14 @@ export default function ClaimForm() {
     setLoading(true)
 
     try {
+      // Credentials: 'include' sends the payload-token cookie so the backend
+      // identifies the logged-in user — no manual passenger ID needed.
       const res = await fetch('/api/v1/claims', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           flight_id: flightId,
-          passenger_id: passengerId,
           delay_minutes: Number(delayMinutes),
         }),
       })
@@ -84,7 +85,7 @@ export default function ClaimForm() {
             </div>
           </div>
           <button
-            onClick={() => { setResult(null); setFlightId(''); setPassengerId(''); setDelayMinutes('') }}
+            onClick={() => { setResult(null); setFlightId(''); setDelayMinutes('') }}
             className="mt-5 text-sm text-indigo-400 hover:text-indigo-300 underline"
           >
             Submit another claim
@@ -112,20 +113,6 @@ export default function ClaimForm() {
               placeholder="e.g. AA1234"
               value={flightId}
               onChange={(e) => setFlightId(e.target.value)}
-              required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-              Passenger ID
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. your user ID or booking reference"
-              value={passengerId}
-              onChange={(e) => setPassengerId(e.target.value)}
               required
               className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
             />

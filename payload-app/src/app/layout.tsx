@@ -68,7 +68,6 @@ export default async function RootLayout({
                     {userEmail}
                   </span>
                   <form action="/api/users/logout" method="POST">
-                    <input type="hidden" name="_redirect" value="/" />
                     <button
                       type="submit"
                       className="bg-red-700 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs transition"
@@ -79,11 +78,11 @@ export default async function RootLayout({
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-gray-300 hover:text-white transition">
+                  <Link href="/admin/login" className="text-gray-300 hover:text-white transition">
                     Login
                   </Link>
                   <Link
-                    href="/signup"
+                    href="/admin/create-first-user"
                     className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded transition"
                   >
                     Sign Up

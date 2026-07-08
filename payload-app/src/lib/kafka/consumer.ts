@@ -46,11 +46,14 @@ export async function startDelayConsumer(payload: BasePayload): Promise<void> {
         // Calculate payout: €250 for <1500km, €400 otherwise (simplified)
         const payoutAmount = event.delay_minutes >= 240 ? 600 : 250
 
+        // Look up the user by passenger_id (which is the user's Payload document ID)
+        // The create is performed with overrideAccess so the system consumer can always write
         await payload.create({
           collection: 'claims',
+          overrideAccess: true,
           data: {
             flightId: event.flight_id,
-            passengerId: event.passenger_id,
+            passenger: event.passenger_id,
             airline: event.airline,
             delayMinutes: event.delay_minutes,
             payoutAmount,

@@ -23,12 +23,19 @@ function matchVehicle(volumeLiters: number, weightLbs: number): Vehicle | undefi
 }
 
 export async function POST(req: NextRequest) {
-  const { pickup, dropoff, luggage_volume, luggage_weight, passenger_id } = (await req.json()) as {
+  const payload = await getPayload({ config })
+
+  // Resolve the authenticated user from the Payload-token cookie
+  const authResult = await payload.auth({ headers: req.headers })
+  if (!authResult.user) {
+    return Response.json({ error: 'Unauthorized — please log in to book a ride' }, { status: 401 })
+  }
+
+  const { pickup, dropoff, luggage_volume, luggage_weight } = (await req.json()) as {
     pickup: string
     dropoff: string
     luggage_volume: number
     luggage_weight: number
-    passenger_id?: string
   }
 
   if (!pickup || !dropoff || luggage_volume == null || luggage_weight == null) {
@@ -47,7 +54,6 @@ export async function POST(req: NextRequest) {
   const overweightFee = Math.max(0, (luggage_weight - 20) * 0.5)
   const totalFee = matched.base_fee + overweightFee
 
-  const payload = await getPayload({ config })
   const ride = await payload.create({
     collection: 'rides',
     data: {
@@ -55,7 +61,8 @@ export async function POST(req: NextRequest) {
       totalFee,
       pickup,
       dropoff,
-      ...(passenger_id ? { passengerId: passenger_id } : {}),
+      // Link the ride to the authenticated user via the relationship field
+      passenger: authResult.user.id,
     },
   })
 

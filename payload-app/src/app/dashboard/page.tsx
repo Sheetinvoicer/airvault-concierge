@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 interface Claim {
   id: string
   flightId: string
+  passenger: string | { id: string; email: string }
   delayMinutes: number
   payoutAmount: number
   status: string
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
   const token = cookieStore.get('payload-token')?.value
 
   if (!token) {
-    redirect('/login')
+    redirect('/admin/login')
   }
 
   const payload = await getPayload({ config })
@@ -47,11 +48,11 @@ export default async function DashboardPage() {
     const authResult = await payload.auth({
       headers: new Headers({ cookie: `payload-token=${token}` }),
     })
-    if (!authResult.user) redirect('/login')
+    if (!authResult.user) redirect('/admin/login')
     userEmail = authResult.user.email ?? ''
     userId = String(authResult.user.id)
   } catch {
-    redirect('/login')
+    redirect('/admin/login')
   }
 
   // Fetch last 5 claims
@@ -59,7 +60,7 @@ export default async function DashboardPage() {
   try {
     const claimsResult = await payload.find({
       collection: 'claims',
-      where: { passengerId: { equals: userId } },
+      where: { passenger: { equals: userId } },
       limit: 5,
       sort: '-createdAt',
     })

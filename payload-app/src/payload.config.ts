@@ -6,8 +6,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-
-import { Users } from './collections/Users'
+import { Users, isAdmin } from './collections/Users'
 import { Flights } from './collections/Flights'
 import { Claims } from './collections/Claims'
 import { Rides } from './collections/Rides'
@@ -23,6 +22,8 @@ const isPostgres = databaseUri.startsWith('postgresql:') || databaseUri.startsWi
 export default buildConfig({
   admin: {
     user: Users.slug,
+    // Only users with role === 'admin' may access the Payload admin panel
+    access: isAdmin,
     importMap: {
       baseDir: path.resolve(dirname),
     },

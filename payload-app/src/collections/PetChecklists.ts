@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
-import type { User } from '../payload-types'
+
+// Minimal shape used for access-control checks (avoids depending on generated payload-types)
+type AnyUser = { id: string | number; role?: string } | null
 
 // Ownership check: scopes list queries to the requesting user's checklists
-const ownedByUser = (user: User) => ({ owner: { equals: user.id } })
+const ownedByUser = (user: NonNullable<AnyUser>) => ({ owner: { equals: user.id } })
 
 export const PetChecklists: CollectionConfig = {
   slug: 'pet-checklists',
@@ -16,17 +18,17 @@ export const PetChecklists: CollectionConfig = {
     // Admins see all; users see only their own
     read: ({ req: { user } }) => {
       if (!user) return false
-      if ((user as User).role === 'admin') return true
-      return ownedByUser(user as User)
+      if ((user as AnyUser)?.role === 'admin') return true
+      return ownedByUser(user as NonNullable<AnyUser>)
     },
     // Owner or admin may update
     update: ({ req: { user } }) => {
       if (!user) return false
-      if ((user as User).role === 'admin') return true
-      return ownedByUser(user as User)
+      if ((user as AnyUser)?.role === 'admin') return true
+      return ownedByUser(user as NonNullable<AnyUser>)
     },
     // Only admins may delete
-    delete: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+    delete: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
   },
   fields: [
     {

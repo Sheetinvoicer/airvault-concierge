@@ -1,9 +1,11 @@
 import type { CollectionConfig } from 'payload'
-import type { User } from '../payload-types'
 import { publishClaimEvent } from '../lib/kafka/producer'
 
+// Minimal shape used for access-control checks (avoids depending on generated payload-types)
+type AnyUser = { id: string | number; role?: string } | null
+
 // Ownership check: returns a Payload where-constraint scoping reads to the requesting user's claims
-const ownedByUser = (user: User) => ({ passenger: { equals: user.id } })
+const ownedByUser = (user: NonNullable<AnyUser>) => ({ passenger: { equals: user.id } })
 
 export const Claims: CollectionConfig = {
   slug: 'claims',
@@ -29,17 +31,17 @@ export const Claims: CollectionConfig = {
     // Admins see all claims; authenticated users see only their own
     read: ({ req: { user } }) => {
       if (!user) return false
-      if ((user as User).role === 'admin') return true
-      return ownedByUser(user as User)
+      if ((user as AnyUser)?.role === 'admin') return true
+      return ownedByUser(user as NonNullable<AnyUser>)
     },
     // Only the owner or an admin may update a claim
     update: ({ req: { user } }) => {
       if (!user) return false
-      if ((user as User).role === 'admin') return true
-      return ownedByUser(user as User)
+      if ((user as AnyUser)?.role === 'admin') return true
+      return ownedByUser(user as NonNullable<AnyUser>)
     },
     // Only admins may delete claims
-    delete: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+    delete: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
   },
   fields: [
     {
@@ -83,7 +85,7 @@ export const Claims: CollectionConfig = {
       ],
       // Only admins may change claim status
       access: {
-        update: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+        update: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
       },
     },
     {
@@ -95,8 +97,8 @@ export const Claims: CollectionConfig = {
       type: 'text',
       // Internal field — only admins should see/edit it
       access: {
-        read: ({ req: { user } }) => (user as User | null)?.role === 'admin',
-        update: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+        read: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
+        update: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
       },
     },
   ],

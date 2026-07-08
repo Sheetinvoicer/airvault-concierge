@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
-import type { User } from '../payload-types'
+
+// Minimal shape used for access-control checks (avoids depending on generated payload-types)
+type AnyUser = { id: string | number; role?: string } | null
 
 export const Flights: CollectionConfig = {
   slug: 'flights',
@@ -11,11 +13,11 @@ export const Flights: CollectionConfig = {
     // Anyone (including unauthenticated visitors) can browse flights
     read: () => true,
     // Only admins / service accounts may create flight records
-    create: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+    create: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
     // Only admins may update flight records
-    update: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+    update: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
     // Only admins may delete flight records
-    delete: ({ req: { user } }) => (user as User | null)?.role === 'admin',
+    delete: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
   },
   fields: [
     {

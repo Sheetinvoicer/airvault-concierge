@@ -36,7 +36,7 @@ export default buildConfig({
     ? postgresAdapter({ pool: { connectionString: databaseUri } })
     : sqliteAdapter({ client: { url: databaseUri } }),
   sharp,
-  serverURL: process.env._PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
 
   // Email adapter (keep as is)
   email: resendAdapter({

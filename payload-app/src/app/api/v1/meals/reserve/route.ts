@@ -4,6 +4,14 @@ import config from '@payload-config'
 import crypto from 'crypto'
 
 export async function POST(req: NextRequest) {
+  const payload = await getPayload({ config })
+
+  // Resolve the authenticated user from the Payload-token cookie
+  const authResult = await payload.auth({ headers: req.headers })
+  if (!authResult.user) {
+    return Response.json({ error: 'Unauthorized — please log in to reserve a meal' }, { status: 401 })
+  }
+
   const { flight_id, meal_id, seat_number } = (await req.json()) as {
     flight_id: string
     meal_id: string
@@ -16,8 +24,6 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
   }
-
-  const payload = await getPayload({ config })
 
   // Verify meal exists and is available
   try {

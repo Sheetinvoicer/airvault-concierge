@@ -37,7 +37,7 @@ export default async function DashboardPage() {
   const token = cookieStore.get('payload-token')?.value
 
   if (!token) {
-    redirect('/admin/login')
+    redirect('/login')
   }
 
   const payload = await getPayload({ config })
@@ -48,11 +48,11 @@ export default async function DashboardPage() {
     const authResult = await payload.auth({
       headers: new Headers({ cookie: `payload-token=${token}` }),
     })
-    if (!authResult.user) redirect('/admin/login')
+    if (!authResult.user) redirect('/login')
     userEmail = authResult.user.email ?? ''
     userId = String(authResult.user.id)
   } catch {
-    redirect('/admin/login')
+    redirect('/login')
   }
 
   // Fetch last 5 claims

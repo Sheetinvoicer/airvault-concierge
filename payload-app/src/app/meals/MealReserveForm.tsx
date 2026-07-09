@@ -31,6 +31,7 @@ export default function MealReserveForm({ mealId, mealName }: Props) {
     try {
       const res = await fetch('/api/v1/meals/reserve', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           flight_id: flightId,

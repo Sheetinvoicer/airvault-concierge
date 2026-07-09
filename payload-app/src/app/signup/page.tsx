@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -47,10 +48,12 @@ export default function SignupPage() {
       })
 
       if (loginRes.ok) {
-        router.push('/dashboard')
+        // Redirect to the original destination if one was preserved, otherwise go to dashboard
+        const from = searchParams.get('from')
+        router.push(from && from.startsWith('/') ? from : '/dashboard')
         router.refresh()
       } else {
-        // Account was created — just redirect to login
+        // Account was created but auto-login failed — redirect to login
         router.push('/login')
       }
     } catch {
@@ -147,5 +150,13 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   )
 }

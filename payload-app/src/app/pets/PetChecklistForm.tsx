@@ -20,6 +20,7 @@ export default function PetChecklistForm() {
     try {
       const res = await fetch('/api/v1/pets/checklist', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           origin,

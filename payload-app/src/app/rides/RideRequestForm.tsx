@@ -28,6 +28,7 @@ export default function RideRequestForm() {
     try {
       const res = await fetch('/api/v1/rides/request', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pickup,

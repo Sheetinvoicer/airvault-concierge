@@ -1,9 +1,9 @@
 /**
  * Tests for the route-guarding middleware.
  *
- * The middleware checks for a `payload-token` cookie and redirects
- * unauthenticated visitors to /login.  Public paths (/login, /signup,
- * /api/*, /admin/*) bypass the check entirely.
+ * Unauthenticated visitors are redirected to /signup (the app entry point).
+ * Public paths (/login, /signup, /api/*, /admin/*) bypass the check.
+ * Authenticated users visiting /signup or /login are redirected to /dashboard.
  */
 import { describe, it, expect } from 'vitest'
 import { NextRequest } from 'next/server'
@@ -19,22 +19,22 @@ function makeRequest(pathname: string, hasCookie = false): NextRequest {
 }
 
 describe('middleware — unauthenticated', () => {
-  it('redirects / to /login when no cookie', () => {
+  it('redirects / to /signup when no cookie', () => {
     const res = middleware(makeRequest('/'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toMatch('/login')
+    expect(res.headers.get('location')).toMatch('/signup')
   })
 
-  it('redirects /dashboard to /login when no cookie', () => {
+  it('redirects /dashboard to /signup when no cookie', () => {
     const res = middleware(makeRequest('/dashboard'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toMatch('/login')
+    expect(res.headers.get('location')).toMatch('/signup')
   })
 
-  it('redirects /claims to /login when no cookie', () => {
+  it('redirects /claims to /signup when no cookie', () => {
     const res = middleware(makeRequest('/claims'))
     expect(res.status).toBe(307)
-    expect(res.headers.get('location')).toMatch('/login')
+    expect(res.headers.get('location')).toMatch('/signup')
   })
 
   it('preserves the original path in the `from` query param', () => {
@@ -53,6 +53,18 @@ describe('middleware — authenticated', () => {
   it('allows /dashboard through when cookie present', () => {
     const res = middleware(makeRequest('/dashboard', true))
     expect(res.status).toBe(200)
+  })
+
+  it('redirects /signup to /dashboard when cookie present', () => {
+    const res = middleware(makeRequest('/signup', true))
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toMatch('/dashboard')
+  })
+
+  it('redirects /login to /dashboard when cookie present', () => {
+    const res = middleware(makeRequest('/login', true))
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toMatch('/dashboard')
   })
 })
 

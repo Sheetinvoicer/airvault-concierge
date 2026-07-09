@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -26,7 +27,9 @@ export default function LoginPage() {
       })
 
       if (res.ok) {
-        router.push('/dashboard')
+        // Redirect to the original destination if one was preserved, otherwise go to dashboard
+        const from = searchParams.get('from')
+        router.push(from && from.startsWith('/') ? from : '/dashboard')
         router.refresh()
       } else {
         const data = (await res.json()) as { errors?: { message: string }[]; message?: string }
@@ -115,5 +118,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

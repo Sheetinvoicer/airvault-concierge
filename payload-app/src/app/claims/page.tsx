@@ -29,22 +29,20 @@ export default async function ClaimsPage() {
   const token = cookieStore.get('payload-token')?.value
 
   if (!token) {
-    redirect('/admin/login')
+    redirect('/login')
   }
 
   const payload = await getPayload({ config })
 
-  let userEmail = ''
   let userId = ''
   try {
     const authResult = await payload.auth({
       headers: new Headers({ cookie: `payload-token=${token}` }),
     })
-    if (!authResult.user) redirect('/admin/login')
-    userEmail = authResult.user.email ?? ''
+    if (!authResult.user) redirect('/login')
     userId = String(authResult.user.id)
   } catch {
-    redirect('/admin/login')
+    redirect('/login')
   }
 
   // Fetch the user's claims server-side

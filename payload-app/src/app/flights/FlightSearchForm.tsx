@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { AIRPORTS } from '@/lib/formOptions'
 
 interface Flight {
   id: string
@@ -68,31 +69,39 @@ export default function FlightSearchForm() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-              Origin (IATA)
+              Origin
             </label>
-            <input
-              type="text"
-              placeholder="e.g. JFK"
+            <select
               value={origin}
-              onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-              maxLength={3}
+              onChange={(e) => setOrigin(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Select origin</option>
+              {AIRPORTS.map((a) => (
+                <option key={a.code} value={a.code}>
+                  {a.city}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-              Destination (IATA)
+              Destination
             </label>
-            <input
-              type="text"
-              placeholder="e.g. LHR"
+            <select
               value={destination}
-              onChange={(e) => setDestination(e.target.value.toUpperCase())}
-              maxLength={3}
+              onChange={(e) => setDestination(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Select destination</option>
+              {AIRPORTS.map((a) => (
+                <option key={a.code} value={a.code}>
+                  {a.city}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">

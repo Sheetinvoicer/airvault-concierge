@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { COUNTRIES } from '@/lib/formOptions'
 
 export default function PetChecklistForm() {
   const [origin, setOrigin] = useState('')
@@ -76,27 +77,37 @@ export default function PetChecklistForm() {
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
               Origin Country
             </label>
-            <input
-              type="text"
-              placeholder="e.g. US"
+            <select
               value={origin}
-              onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+              onChange={(e) => setOrigin(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Select origin country</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
               Destination Country
             </label>
-            <input
-              type="text"
-              placeholder="e.g. AU"
+            <select
               value={destination}
-              onChange={(e) => setDestination(e.target.value.toUpperCase())}
+              onChange={(e) => setDestination(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Select destination country</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">

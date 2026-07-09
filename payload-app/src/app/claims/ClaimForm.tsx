@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { DELAY_OPTIONS } from '@/lib/formOptions'
+import { useFlights } from '@/lib/useFlights'
 
 interface ClaimResult {
   id: string
@@ -12,6 +14,7 @@ interface ClaimResult {
 }
 
 export default function ClaimForm() {
+  const { flights } = useFlights()
   const [flightId, setFlightId] = useState('')
   const [delayMinutes, setDelayMinutes] = useState('')
   const [result, setResult] = useState<ClaimResult | null>(null)
@@ -106,32 +109,43 @@ export default function ClaimForm() {
 
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-              Flight ID
+              Flight
             </label>
-            <input
-              type="text"
-              placeholder="e.g. AA1234"
+            <select
               value={flightId}
               onChange={(e) => setFlightId(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">
+                {flights.length === 0 ? 'No flights available yet' : 'Select your flight'}
+              </option>
+              {flights.map((f) => (
+                <option key={f.id} value={f.flightNumber}>
+                  {f.flightNumber} ({f.origin}-{f.destination})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-              Delay (minutes)
+              Delay Length
             </label>
-            <input
-              type="number"
-              placeholder="e.g. 180"
+            <select
               value={delayMinutes}
               onChange={(e) => setDelayMinutes(e.target.value)}
-              min={1}
               required
-              className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">Must be at least 60 minutes to qualify.</p>
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Select delay length</option>
+              {DELAY_OPTIONS.map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Only qualifying delays (60+ minutes) are listed.</p>
           </div>
 
           <button

@@ -6,7 +6,7 @@ type AnyUser = { id: string | number; role?: string } | null
 export const Flights: CollectionConfig = {
   slug: 'flights',
   admin: {
-    useAsTitle: 'id',
+    useAsTitle: 'flightNumber',
     description: 'Flight records — populated by the flight tracker service.',
   },
   access: {
@@ -20,6 +20,14 @@ export const Flights: CollectionConfig = {
     delete: ({ req: { user } }) => (user as AnyUser)?.role === 'admin',
   },
   fields: [
+    {
+      name: 'flightNumber',
+      type: 'text',
+      required: true,
+      admin: {
+        description: 'Airline flight number, e.g. AA1423.',
+      },
+    },
     {
       name: 'airline',
       type: 'text',

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { SEAT_ROWS, SEAT_LETTERS } from '@/lib/formOptions'
+import { useFlights } from '@/lib/useFlights'
 
 interface Props {
   mealId: string
@@ -16,9 +18,11 @@ interface ReserveResult {
 }
 
 export default function MealReserveForm({ mealId, mealName }: Props) {
+  const { flights } = useFlights()
   const [open, setOpen] = useState(false)
   const [flightId, setFlightId] = useState('')
-  const [seatNumber, setSeatNumber] = useState('')
+  const [seatRow, setSeatRow] = useState('')
+  const [seatLetter, setSeatLetter] = useState('')
   const [result, setResult] = useState<ReserveResult | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -36,7 +40,7 @@ export default function MealReserveForm({ mealId, mealName }: Props) {
         body: JSON.stringify({
           flight_id: flightId,
           meal_id: mealId,
-          seat_number: seatNumber,
+          seat_number: `${seatRow}${seatLetter}`,
         }),
       })
 
@@ -83,22 +87,49 @@ export default function MealReserveForm({ mealId, mealName }: Props) {
           {error && (
             <p className="text-red-400 text-xs">{error}</p>
           )}
-          <input
-            type="text"
-            placeholder="Flight ID (e.g. AA1234)"
+          <select
             value={flightId}
             onChange={(e) => setFlightId(e.target.value)}
             required
-            className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
-          />
-          <input
-            type="text"
-            placeholder="Seat Number (e.g. 12A)"
-            value={seatNumber}
-            onChange={(e) => setSeatNumber(e.target.value)}
-            required
-            className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
-          />
+            className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+          >
+            <option value="">
+              {flights.length === 0 ? 'No flights available' : 'Select flight'}
+            </option>
+            {flights.map((f) => (
+              <option key={f.id} value={f.flightNumber}>
+                {f.flightNumber} ({f.origin}-{f.destination})
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2">
+            <select
+              value={seatRow}
+              onChange={(e) => setSeatRow(e.target.value)}
+              required
+              className="flex-1 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Row</option>
+              {SEAT_ROWS.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+            <select
+              value={seatLetter}
+              onChange={(e) => setSeatLetter(e.target.value)}
+              required
+              className="flex-1 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500"
+            >
+              <option value="">Seat</option>
+              {SEAT_LETTERS.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex gap-2">
             <button
               type="submit"

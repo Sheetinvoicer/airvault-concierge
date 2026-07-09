@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { cookies } from 'next/headers'
+import { cookies, headers as nextHeaders } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -42,18 +42,18 @@ export default async function DashboardPage() {
 
   const payload = await getPayload({ config })
 
-  let userEmail = ''
-  let userId = ''
+  // Pass the real incoming request headers (Cookie + Sec-Fetch-Site) so Payload's
+  // cookie auth accepts the session. Rebuilding headers with only the cookie makes
+  // Payload reject it (missing Sec-Fetch-Site/Origin) and bounce logged-in users.
+  let authResult: Awaited<ReturnType<typeof payload.auth>>
   try {
-    const authResult = await payload.auth({
-      headers: new Headers({ cookie: `payload-token=${token}` }),
-    })
-    if (!authResult.user) redirect('/login')
-    userEmail = authResult.user.email ?? ''
-    userId = String(authResult.user.id)
+    authResult = await payload.auth({ headers: await nextHeaders() })
   } catch {
     redirect('/login')
   }
+  if (!authResult.user) redirect('/login')
+  const userEmail = authResult.user.email ?? ''
+  const userId = String(authResult.user.id)
 
   // Fetch last 5 claims
   let recentClaims: Claim[] = []

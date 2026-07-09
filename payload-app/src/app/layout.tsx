@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
+import { cookies, headers as nextHeaders } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import './globals.css'
@@ -22,9 +22,9 @@ export default async function RootLayout({
   if (token) {
     try {
       const payload = await getPayload({ config })
-      const authResult = await payload.auth({
-        headers: new Headers({ cookie: `payload-token=${token}` }),
-      })
+      // Use the real incoming request headers (Cookie + Sec-Fetch-Site) so Payload's
+      // cookie auth accepts the session; a cookie-only headers object gets rejected.
+      const authResult = await payload.auth({ headers: await nextHeaders() })
       userEmail = authResult.user?.email ?? null
     } catch {
       // session invalid — show logged-out nav

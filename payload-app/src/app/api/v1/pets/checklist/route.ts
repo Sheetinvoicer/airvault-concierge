@@ -67,13 +67,13 @@ async function generatePdf(
   y -= 10
   drawLine(`Owner: ${ownerName}`)
   drawLine(`Pet: ${petName}`)
-  drawLine(`Route: ${req.origin} → ${req.destination}`)
+  drawLine(`Route: ${req.origin} -> ${req.destination}`)
   y -= 10
   drawLine('Requirements:', true)
-  drawLine(`  ✓ Rabies vaccination: ${req.vaccineRequired ? 'Required' : 'Not required'}`)
-  drawLine(`  ✓ Microchip (ISO 11784/11785): ${req.microchipRequired ? 'Required' : 'Not required'}`)
-  drawLine(`  ✓ Quarantine: ${req.quarantineDays > 0 ? `${req.quarantineDays} days` : 'Not required'}`)
-  drawLine(`  ✓ Approved carriers: ${req.allowedCarriers.join(', ')}`)
+  drawLine(`  - Rabies vaccination: ${req.vaccineRequired ? 'Required' : 'Not required'}`)
+  drawLine(`  - Microchip (ISO 11784/11785): ${req.microchipRequired ? 'Required' : 'Not required'}`)
+  drawLine(`  - Quarantine: ${req.quarantineDays > 0 ? `${req.quarantineDays} days` : 'Not required'}`)
+  drawLine(`  - Approved carriers: ${req.allowedCarriers.join(', ')}`)
   y -= 10
   drawLine('Notes:', true)
   drawLine(`  ${req.notes}`, false, 10)
@@ -84,6 +84,17 @@ async function generatePdf(
 }
 
 export async function POST(req: NextRequest) {
+  const payload = await getPayload({ config })
+
+  // Resolve the authenticated user from the Payload-token cookie
+  const authResult = await payload.auth({ headers: req.headers })
+  if (!authResult.user) {
+    return Response.json(
+      { error: 'Unauthorized — please log in to generate a checklist' },
+      { status: 401 },
+    )
+  }
+
   const { origin, destination, owner_name, pet_name } = (await req.json()) as {
     origin: string
     destination: string
@@ -101,11 +112,17 @@ export async function POST(req: NextRequest) {
   const requirements = await fetchRequirements(origin, destination)
   const pdfBytes = await generatePdf(requirements, owner_name, pet_name)
 
-  const payload = await getPayload({ config })
-  await payload.create({
-    collection: 'pet-checklists',
-    data: { origin, destination, owner: owner_name, petName: pet_name },
-  })
+  // `owner` is a relationship field — it must reference the authenticated user's id,
+  // not the free-text owner name (which is only used for display on the PDF).
+  try {
+    await payload.create({
+      collection: 'pet-checklists',
+      data: { origin, destination, owner: authResult.user.id, petName: pet_name },
+    })
+  } catch (err) {
+    // Persistence is secondary — still return the generated PDF to the user.
+    console.error('[pets/checklist] Failed to save checklist record:', err)
+  }
 
   return new Response(pdfBytes as unknown as BodyInit, {
     status: 200,

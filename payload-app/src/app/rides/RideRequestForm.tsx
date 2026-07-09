@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { RIDE_LOCATIONS, LUGGAGE_OPTIONS } from '@/lib/formOptions'
 
 interface RideResult {
   ride_id: string
@@ -13,8 +14,7 @@ interface RideResult {
 export default function RideRequestForm() {
   const [pickup, setPickup] = useState('')
   const [dropoff, setDropoff] = useState('')
-  const [luggageVolume, setLuggageVolume] = useState('')
-  const [luggageWeight, setLuggageWeight] = useState('')
+  const [luggageIdx, setLuggageIdx] = useState('')
   const [result, setResult] = useState<RideResult | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,6 +25,8 @@ export default function RideRequestForm() {
     setResult(null)
     setLoading(true)
 
+    const luggage = luggageIdx === '' ? null : LUGGAGE_OPTIONS[Number(luggageIdx)]
+
     try {
       const res = await fetch('/api/v1/rides/request', {
         method: 'POST',
@@ -33,8 +35,8 @@ export default function RideRequestForm() {
         body: JSON.stringify({
           pickup,
           dropoff,
-          luggage_volume: Number(luggageVolume),
-          luggage_weight: Number(luggageWeight),
+          luggage_volume: luggage?.volume ?? 0,
+          luggage_weight: luggage?.weight ?? 0,
         }),
       })
 
@@ -89,7 +91,7 @@ export default function RideRequestForm() {
             </div>
           </div>
           <button
-            onClick={() => { setResult(null); setPickup(''); setDropoff(''); setLuggageVolume(''); setLuggageWeight('') }}
+            onClick={() => { setResult(null); setPickup(''); setDropoff(''); setLuggageIdx('') }}
             className="mt-5 text-sm text-indigo-400 hover:text-indigo-300 underline"
           >
             Book another ride
@@ -111,55 +113,55 @@ export default function RideRequestForm() {
               <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
                 Pickup Location
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Terminal 2, JFK Airport"
+              <select
                 value={pickup}
                 onChange={(e) => setPickup(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-              />
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">Select pickup location</option>
+                {RIDE_LOCATIONS.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
                 Dropoff Location
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Manhattan Midtown Hotel"
+              <select
                 value={dropoff}
                 onChange={(e) => setDropoff(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-              />
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">Select dropoff location</option>
+                {RIDE_LOCATIONS.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                Luggage Volume (Liters)
+                Luggage
               </label>
-              <input
-                type="number"
-                placeholder="e.g. 50"
-                value={luggageVolume}
-                onChange={(e) => setLuggageVolume(e.target.value)}
-                min={0}
+              <select
+                value={luggageIdx}
+                onChange={(e) => setLuggageIdx(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1 uppercase tracking-wide">
-                Luggage Weight (lbs)
-              </label>
-              <input
-                type="number"
-                placeholder="e.g. 45"
-                value={luggageWeight}
-                onChange={(e) => setLuggageWeight(e.target.value)}
-                min={0}
-                required
-                className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
-              />
+                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500"
+              >
+                <option value="">Select luggage size</option>
+                {LUGGAGE_OPTIONS.map((opt, i) => (
+                  <option key={opt.label} value={i}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

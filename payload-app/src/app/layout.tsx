@@ -78,11 +78,11 @@ export default async function RootLayout({
                 </>
               ) : (
                 <>
-                  <Link href="/admin/login" className="text-gray-300 hover:text-white transition">
+                  <Link href="/login" className="text-gray-300 hover:text-white transition">
                     Login
                   </Link>
                   <Link
-                    href="/admin/create-first-user"
+                    href="/signup"
                     className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded transition"
                   >
                     Sign Up

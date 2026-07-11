@@ -15,7 +15,7 @@ function makeRequest(pathname: string, hasCookie = false): NextRequest {
   if (hasCookie) {
     req.cookies.set('payload-token', 'fake-jwt-token')
   }
-  return req
+  return reqju
 }
 
 describe('middleware — unauthenticated', () => {

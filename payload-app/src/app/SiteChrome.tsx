@@ -94,7 +94,10 @@ export function SiteChrome({
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 text-center text-gray-400 text-sm py-6">
+      <footer
+        suppressHydrationWarning
+        className="bg-gray-900 border-t border-gray-800 text-center text-gray-400 text-sm py-6"
+      >
         &copy; {new Date().getFullYear()} AirVault Concierge. All rights reserved.
       </footer>
     </>

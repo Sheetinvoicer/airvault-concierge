@@ -7,7 +7,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { NextRequest } from 'next/server'
-import { middleware } from '../middleware'
+import { middleware } from '@/middleware'
 
 function makeRequest(pathname: string, hasCookie = false): NextRequest {
   const url = `http://localhost:3000${pathname}`
@@ -15,7 +15,7 @@ function makeRequest(pathname: string, hasCookie = false): NextRequest {
   if (hasCookie) {
     req.cookies.set('payload-token', 'fake-jwt-token')
   }
-  return reqju
+  return req
 }
 
 describe('middleware — unauthenticated', () => {

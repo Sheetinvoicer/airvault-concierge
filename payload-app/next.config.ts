@@ -36,6 +36,30 @@ const nextConfig: NextConfig = {
         'monaco-editor': false,
       }
     }
+
+    // Split heavy, non-critical vendor libraries into separate async chunks so
+    // the login/signup LCP is not blocked by code that is only needed post-login.
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization?.splitChunks,
+          cacheGroups: {
+            ...(config.optimization?.splitChunks?.cacheGroups ?? {}),
+            // Keep Stripe, PDF, Kafka, Redis, and WS in their own deferred chunks
+            // so the critical login path is not blocked by their initialisation code.
+            heavyVendors: {
+              test: /[\\/]node_modules[\\/](stripe|pdf-lib|kafkajs|ioredis|ws)[\\/]/,
+              name: 'heavy-vendors',
+              chunks: 'async',
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      }
+    }
+
     return config
   },
 }

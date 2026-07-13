@@ -15,10 +15,9 @@
     "test:watch": "vitest"
   },
   "browserslist": [
-    "last 2 Chrome versions",
-    "last 2 Firefox versions",
-    "last 2 Safari versions",
-    "last 2 Edge versions"
+    "last 2 versions",
+    "not dead",
+    "since 2020"
   ],
   "dependencies": {
     "@payloadcms/db-postgres": "^3.85.0",

@@ -8,7 +8,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Flights } from './collections/Flights'
-import { Claims } from './collections/Claims'
+//import { Claims } from './collections/Claims'
 import { Rides } from './collections/Rides'
 import { PetChecklists } from './collections/PetChecklists'
 import { Meals } from './collections/Meals'

@@ -1,4 +1,3 @@
-cat > src/collections/Users.ts << 'EOF'
 import type { CollectionConfig } from 'payload'
 
 // Minimal shape used for access-control checks (avoids depending on generated payload-types)
@@ -62,4 +61,3 @@ export const Users: CollectionConfig = {
     },
   ],
 }
-EOF
